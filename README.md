@@ -28,15 +28,11 @@ for x range(1,T) {
 
 **Explanation**     
 
-Here, each third brackets pair is a print command which prints the content inside the brackets exactly as it appears.
-
-`rand` is a function which returns a random value.
-
-You can use single quotes inside third brackets to execute a code and print it. Similarly the variable T was printed.
-
-`for` indicates the start of a loop. Next variable should be a range to loop (like python except it is inclusive).
-
-All statements are in a single line. Curly brackets indicates a complex statement of multiple statements. 
+- Each third brackets pair is a print command which prints the content inside the brackets exactly as it appears.
+- `rand` is a function which returns a random value.
+- You can use single quotes inside third brackets to execute a code and print it. Similarly the variable T was printed.
+- `for` indicates the start of a loop. Next variable should be a range to loop (like python except it is inclusive).
+- All statements are in a single line. Curly brackets indicates a complex statement of multiple statements. 
 
 ---
 All the description is of initial plan. It is subject to change with development process.

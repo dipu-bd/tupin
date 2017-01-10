@@ -1,0 +1,6 @@
+T = rand(1,25)
+['T']
+for x range(1,T) {
+  [\n]
+  ['rand(0,20)'\n]
+}

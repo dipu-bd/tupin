@@ -1,31 +1,50 @@
 %{
-    #include <bits/stdc++.h>
+    #include "Lexer.h"        
 %}
 
-%option noyywrap main
+%option noyywrap main yylineno
+
+%x STRING COMMENT
 
 DIGIT   [0-9]
 INT     [-]?{DIGIT}+
-FLOAT   {INT}+"."{DIGIT}*
-EFLOAT  {INT}+("."{DIGIT}*)?[eE]{INT}
-HEXA    [-]?0[hH][0-9A-Fa-f]+
+FLOAT   {INT}"."{DIGIT}*  
+EFLOAT  ({FLOAT}|{INT})[eE][+-]?{DIGIT}+
+HEXA    [-]?0[xX][0-9A-Fa-f]+
 OCTA    [-]?0[oO][0-7]+
 BIN     [-]?0[bB][01]+
 
 ID      [_$A-Za-z][_$0-9A-Za-z]*
 
 %%
+    /* Row and column tracker */
+    colno = 0; 
+    printf("%3d. ", yylineno);
+    
+    /* Whitespaces */
+[ \t]       ++colno; /* skip whitespace */
+    /* Comments */
 
-{BIN}       { printf("BINARY: %s\n", yytext); }
-{OCTA}      { printf("OCTAL: %s\n", yytext); }    
-{HEXA}      { printf("HEXA: %s\n", yytext); }    
-{EFLOAT}    { printf("EFLOAT: %s\n", yytext); }       
-{FLOAT}     { printf("EFLOAT: %s\n", yytext); }       
-{INT}       { printf("INTEGER: %s\n", yytext); } 
+    /* Numbers */    
+{BIN}       { number(yytext + 2, 2);    colno += yyleng; }
+{OCTA}      { number(yytext + 2, 8);    colno += yyleng; }      
+{HEXA}      { number(yytext + 2, 16);   colno += yyleng; }   
+{EFLOAT}    { number(yytext, 0);        colno += yyleng; }       
+{FLOAT}     { number(yytext, 0);        colno += yyleng; }      
+{INT}       { number(yytext, 10);       colno += yyleng; } 
 
-{ID}        { printf("ID: %s\n", yytext); }
+    /* Identifier */
+{ID}        { identifier(yytext);       colno += yyleng; }
 
-.           /* ignore */
-\n          ECHO;
+.           { yyerror("Unrecognized Character");  colno += yyleng; }
+\n          { colno = 0; printf("\n%3d. ", yylineno); }
 
-%%
+%% 
+ 
+
+
+
+
+
+
+

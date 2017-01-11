@@ -4,13 +4,22 @@
 
 
 ### Whitespaces
-
+- Spaces
+- Tabs 
+- New lines
+- Empty lines
 
 ### Comments
-
+- Single line
+- Multi-line
 
 ### Numbers
-
+- Integers
+- Floats
+- Scientific
+- Binary
+- Octal
+- Hexadecimal
 
 ### Keywords
 
@@ -19,7 +28,8 @@
 
 
 ### Strings
-
+- Single quote
+- Double quote
 
 ### Operators
 

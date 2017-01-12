@@ -10,15 +10,16 @@
 
 %x string comment
 
-DIGIT   [0-9]
-INT     [-]?{DIGIT}+
-FLOAT   {INT}"."{DIGIT}*  
-EFLOAT  ({FLOAT}|{INT})[eE][+-]?{DIGIT}+
-HEXA    [-]?0[xX][0-9A-Fa-f]+
-OCTA    [-]?0[oO][0-7]+
-BIN     [-]?0[bB][01]+
+DIGIT           [0-9]
+INT             [-]?{DIGIT}+
+FLOAT           {INT}"."{DIGIT}*  
+EFLOAT          ({FLOAT}|{INT})[eE][+-]?{DIGIT}+
+HEXA            [-]?0[xX][0-9A-Fa-f]+
+OCTA            [-]?0[oO][0-7]+
+BIN             [-]?0[bB][01]+
+INVALID_NUMBER  ({BIN}|{OCTA}|{HEXA}|{EFLOAT}|{FLOAT}|{INT})[[:alnum:]]+
 
-ID      [_$A-Za-z][_$0-9A-Za-z]*
+IDENTIFIER      [_$A-Za-z][_$0-9A-Za-z]*
 
 %%
     /* Row and column tracker */
@@ -26,23 +27,32 @@ ID      [_$A-Za-z][_$0-9A-Za-z]*
     printf("%3d. ", yylineno);
     
     /* Whitespaces */
-[ \t]+		/* skip whitespace */
+[ \t]+		            /* skip whitespace */
 
     /* Comments */
+"//"[^\n]*              /* single line comment */
+<INITIAL>"/*"           { BEGIN(comment); }
+<comment>[^*\n]*        /* eat anything that's not a '*'' */
+<comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s  */ 
+<comment>"*/"           { BEGIN(INITIAL); }
+
+    /* Strings */
+    
 
     /* Numbers */    
-{BIN}/[^[:alpha:]]       { number(yytext + 2, 2); }
-{OCTA}/[^[:alpha:]]      { number(yytext + 2, 8); }      
-{HEXA}/[^[:alpha:]]      { number(yytext + 2, 16); }   
-{EFLOAT}/[^[:alpha:]]    { number(yytext, 0); }       
-{FLOAT}/[^[:alpha:]]     { number(yytext, 0); }      
-{INT}/[^[:alpha:]]       { number(yytext, 10); } 
+{BIN}               { number(yytext + 2, 2); }
+{OCTA}              { number(yytext + 2, 8); }      
+{HEXA}              { number(yytext + 2, 16); }   
+{EFLOAT}            { number(yytext, 0); }       
+{FLOAT}             { number(yytext, 0); }      
+{INT}               { number(yytext, 10); } 
+{INVALID_NUMBER}    { yyerror("Invalid number"); }
 
     /* Identifier */
-{ID}        { identifier(yytext); }
+{IDENTIFIER}        { identifier(yytext); }
 
-.           { yyerror("Unrecognized Character"); }
-\n          { colno = 0; printf("\n%3d. ", yylineno); }
+.                   { yyerror("Unrecognized Character"); }
+<*>\n               { colno = 0; printf("\n%3d. ", yylineno); }
 
 %% 
  

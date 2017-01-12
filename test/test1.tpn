@@ -1,3 +1,7 @@
 T = rand(1,125)
 ['T']
-for range(T-1) : [\n'rand(0,10)' 'rand(0,10)']
+for range(T-1) {
+    n = rand(0,10)
+    m = rand(0,10)
+    [\n'n' 'm']
+}

@@ -8,14 +8,14 @@ Environment env;
  
 void yyerror(const char *s)
 {
-    fprintf(stderr, "# %s:%d:%d: %s %s\n", env.cur(), loc.line, loc.col, s, yytext);
+    fprintf(stderr, "# %s:%d:%d: %s %s\n", env.input(), loc.line, loc.col, s, yytext);
 }
 
 void checkNumber(const char *s, int base = 10)
 {
     if (base >= 2)
     {
-        long long n = std::strtoll(s, 0, base);
+        long long n = std::strtoll(s, NULL, base);
         printf("~ INTEGER: %lld [base=%d] \"%s\"\n", n, base, yytext);
     }
     else

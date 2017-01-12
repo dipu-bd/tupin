@@ -1,34 +1,49 @@
 
+auto begin = std::chrono::high_resolution_clock::now();
+
 struct Environment
 {
     int argc;
-    char **argv;
+    char **argv;    
 
-    Environment(int c = 0, char **v = 0) : argc(c), argv(v)
-    {
-    }
-    int count()
+    Environment(int c = 0, char **v = 0) : argc(c), argv(v) {         
+    } 
+
+    int count() const
     {
         return argc;
     }
-    char *cur()
+    const char *cur() const
     {
         return argv[0];
     }
-    FILE *input()
+    const char* input() const
     {
-        if (argc >= 1)
+        if(argc >= 1)
         {
-            return fopen(argv[1], "r");
+            return argv[1];
         }
-        return 0;
+        return "";
     }
-    FILE *output()
+    void openInput() const
     {
         if (argc >= 1)
         {
-            return fopen(argv[2], "w");
+            yyin = fopen(argv[1], "r");
         }
-        return 0;
+    }
+    void openOutput() const
+    {
+        if (argc >= 2)
+        {
+            yyout = fopen(argv[2], "w");
+        }
+    }
+    
+    void showTime() const
+    { 
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
+        printf("\n\nRuntime: %f ms\n", duration / 1e6);
     }
 };

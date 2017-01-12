@@ -1,8 +1,14 @@
-
+/**
+    @description 
+        Convert escaped sequence to actual character.
+        It assumes the input will always be syntactically correct.
+        Can handle: Hexadecimal, Octal, and "abfnrtv".
+    @return 
+        The escaped character on success. A negative value on failure.
+*/
 int escapeToChar(const char *str)
 {
     int p = str[1];
-
     if (str[1] == 'x' || str[1] == 'X')
     {
         p = std::strtol(str + 2, 0, 16);

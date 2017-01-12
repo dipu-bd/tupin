@@ -100,14 +100,13 @@ int main(int argc, char** argv)
 { 
     /* Open input and output files for testing */
     env = Environment(argc, argv);  
-    FILE* fin = env.input();
-    FILE* fout = env.output();
-    if(fin) yyin = fin;
-    if(fout) yyout = fout;
+    env.openInput();
+    env.openOutput();
     
     /* start lexer */
     yylex();
 
+    env.showTime();
     return 0;
 } 
 

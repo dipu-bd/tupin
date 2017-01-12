@@ -34,37 +34,3 @@ void checkIdentifier(const char *s)
 {
     printf("~ ID: %s\n", s);
 }
-
-void escapeToChar(char *str, int &pos)
-{
-    while (pos > 0 && str[pos - 1] != '\\')
-        pos--;
-
-    long ch = str[pos];
-    if (str[pos] == 'x' || str[pos] == 'X')
-    {
-        ch = std::strtol(str + pos + 1, 0, 16);
-    }
-    else if (isdigit(str[pos]))
-    {
-        ch = std::strtol(str + pos, 0, 8);
-    }
-    const char *real = "abfnrtv";
-    const char *rplc = "\a\b\f\n\r\t\v";
-    for (int i = strlen(real) - 1; i >= 0; --i)
-    {
-        if (ch == real[i])
-        {
-            ch = rplc[i];
-            break;
-        }
-    }
-    if (ch < 0 || ch > 255)
-    {
-        yyerror("Bad hexadecimal escape sequence");
-        ch = 0;
-    }
-    // set character
-    str[pos - 1] = ch;
-    str[pos] = 0;
-}

@@ -8,25 +8,29 @@
 %option warn 
 
 %x comment
-%x string
-%x regex
+%s string sq dq
 
 DIGIT           [0-9]
+XDIGIT          [A-Fa-f0-9]
 INT             [-]?{DIGIT}+
 FLOAT           {INT}"."{DIGIT}*  
 EFLOAT          ({FLOAT}|{INT})[eE][+-]?{DIGIT}+
-HEXA            [-]?0[xX][0-9A-Fa-f]+
+HEXA            [-]?0[xX]{XDIGIT}+
 OCTA            [-]?0[oO][0-7]+
 BIN             [-]?0[bB][01]+
 INVALID_NUMBER  ({BIN}|{OCTA}|{HEXA}|{EFLOAT}|{FLOAT}|{INT})[[:alnum:]]+
 
 ESC1            [^xX0-7]
 ESC2            [0-7]{1,3}
-ESC3            [xX][0-9A-Fa-f]{1,2}
+ESC3            [xX]{XDIGIT}{1,2}
 ESC             \\({ESC1}|{ESC2}|{ESC3})
-BADESC          \\([0-9]+|[xX])
+BADESC          \\({DIGIT}+|[xX])
 
 IDENTIFIER      [_$A-Za-z][_$0-9A-Za-z]*
+
+SPACE           [ \t\r\v\f]
+
+OPERATOR        [!%&()*+,\-./:;<=>?\[\\\]^{|}~]
 
 %%
     /*********** Declarations **********/ 
@@ -46,21 +50,29 @@ IDENTIFIER      [_$A-Za-z][_$0-9A-Za-z]*
 }
 
     /*********** Strings **********/ 
-<INITIAL>\"         { BEGIN(string); __builder.init(); }
+<INITIAL>\'         { BEGIN(string, sq); __builder.init(); }
+<INITIAL>\"         { BEGIN(string, dq); __builder.init(); }
 <string>{ 
     {ESC}           { if(!__builder.escaped(yytext)) 
                             yyerror("Bad escape sequence"); 
                     }
-    {BADESC}        { yyerror("Unrecognized escape sequence"); }
-    [^\\\"]*        { __builder.append(yytext, yyleng); }
-    "\""            { BEGIN(INITIAL); 
-                      __builder.append(yytext, yyleng - 1); 
-                      checkString(__builder.str); 
+    {BADESC}        { yyerror("Unrecognized escape sequence"); }    
+
+    <sq>[^\\'']*    { __builder.append(yytext, yyleng); }    
+    <sq>"'"         {   BEGIN(INITIAL); 
+                        __builder.append(yytext, yyleng - 1); 
+                        checkString(__builder.str); 
                     }
-}
 
-    /*********** Regex **********/
+    <dq>[^\\""]*    { __builder.append(yytext, yyleng); }    
+    <dq>"\""        {   BEGIN(INITIAL); 
+                        __builder.append(yytext, yyleng - 1); 
+                        checkString(__builder.str); 
+                    }
+} 
 
+    /*********** Operator **********/
+{OPERATOR}          { checkOperator(yytext); }
 
     /*********** Numbers **********/    
 {BIN}               { checkNumber(yytext + 2, 2); }

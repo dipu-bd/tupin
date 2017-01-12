@@ -27,10 +27,15 @@ void checkNumber(const char *s, int base = 10)
 
 void checkString(const char *s)
 {
-    printf("~ STRING: %s\n", s);
+    printf("~ STRING: \"%s\"\n", s);
 }
 
 void checkIdentifier(const char *s)
 {
     printf("~ ID: %s\n", s);
+}
+
+void checkOperator(const char* s) 
+{
+    printf("~ OP: %s\n", s);
 }

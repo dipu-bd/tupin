@@ -2,8 +2,7 @@
 
 > Using `flex` ([Flex manual page](http://dinosaur.compilertools.net/flex/manpage.html))
 
-
-### Whitespaces
+### Whitespace
 - Spaces
 - Tabs 
 - New lines
@@ -13,6 +12,14 @@
 - Single line
 - Multi-line
 
+### Strings
+- Single quote
+- Double quote
+
+### Operators  
+- one char: [!%&()*+,\-./:;<=>?\[\\\]^{|}~]
+- multi char: *handle it on yacc* 
+  
 ### Numbers
 - Integers
 - Floats
@@ -22,14 +29,13 @@
 - Hexadecimal
 
 ### Keywords
+- def return
+- if elif else
+- for continue break
+- and or not xor 
+
+### Identifier
+- [_$A-Za-z][_$0-9A-Za-z]*
 
 
-### Variables
-
-
-### Strings
-- Single quote
-- Double quote
-
-### Operators
 

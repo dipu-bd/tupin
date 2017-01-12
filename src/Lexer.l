@@ -8,7 +8,9 @@
 %option warn 
 
 %x comment
-%s string sq dq
+%x sqstr dqstr
+
+SPACE           [ \t\r\v\f]
 
 DIGIT           [0-9]
 XDIGIT          [A-Fa-f0-9]
@@ -23,25 +25,22 @@ INVALID_NUMBER  ({BIN}|{OCTA}|{HEXA}|{EFLOAT}|{FLOAT}|{INT})[[:alnum:]]+
 ESC1            [^xX0-7]
 ESC2            [0-7]{1,3}
 ESC3            [xX]{XDIGIT}{1,2}
-ESC             \\({ESC1}|{ESC2}|{ESC3})
+ESCAPE          \\({ESC1}|{ESC2}|{ESC3})
 BADESC          \\({DIGIT}+|[xX])
+
+OPERATOR        [!%&()*+,\-./:;<=>?\[\]^{|}~]
 
 IDENTIFIER      [_$A-Za-z][_$0-9A-Za-z]*
 
-SPACE           [ \t\r\v\f]
-
-OPERATOR        [!%&()*+,\-./:;<=>?\[\\\]^{|}~]
+KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"|"or"|"not"|"xor"
 
 %%
     /*********** Declarations **********/ 
     StringBuilder __builder;
     printf("%3d. ", yylineno);
     
-    /*********** Whitespaces **********/
-[ \t\r]+		    /* skip whitespace */
-
     /*********** Comments **********/
-"//"[^\n]*          /* single line comment */
+<INITIAL>"//"[^\n]*     /* eat up single line comment */
 <INITIAL>"/*"       { BEGIN(comment); }
 <comment>{
     [^*\n]*         /* eat anything that's not a '*' */
@@ -50,26 +49,28 @@ OPERATOR        [!%&()*+,\-./:;<=>?\[\\\]^{|}~]
 }
 
     /*********** Strings **********/ 
-<INITIAL>\'         { BEGIN(string, sq); __builder.init(); }
-<INITIAL>\"         { BEGIN(string, dq); __builder.init(); }
-<string>{ 
-    {ESC}           { if(!__builder.escaped(yytext)) 
-                            yyerror("Bad escape sequence"); 
-                    }
-    {BADESC}        { yyerror("Unrecognized escape sequence"); }    
-
-    <sq>[^\\'']*    { __builder.append(yytext, yyleng); }    
-    <sq>"'"         {   BEGIN(INITIAL); 
+<INITIAL>\'         { BEGIN(sqstr); __builder.init(); }
+<INITIAL>\"         { BEGIN(dqstr); __builder.init(); }
+<sqstr,dqstr>{
+    {ESCAPE}            { if(!__builder.escaped(yytext)) 
+                            yyerror("Bad escape sequence"); }
+    {BADESC}            { yyerror("Unrecognized escape sequence"); }    
+}
+<sqstr>{
+    [^\\']*             { __builder.append(yytext, yyleng); }    
+    "'"                 {   BEGIN(INITIAL); 
                         __builder.append(yytext, yyleng - 1); 
-                        checkString(__builder.str); 
-                    }
-
-    <dq>[^\\""]*    { __builder.append(yytext, yyleng); }    
-    <dq>"\""        {   BEGIN(INITIAL); 
+                        checkString(__builder.str);  }
+}
+<dqstr>{
+    [^\\"]*             { __builder.append(yytext, yyleng); }    
+    \"                  {   BEGIN(INITIAL); 
                         __builder.append(yytext, yyleng - 1); 
-                        checkString(__builder.str); 
-                    }
-} 
+                        checkString(__builder.str); }
+}
+
+    /*********** Whitespaces **********/
+[ \t\r]+		    /* skip whitespace */
 
     /*********** Operator **********/
 {OPERATOR}          { checkOperator(yytext); }
@@ -82,6 +83,9 @@ OPERATOR        [!%&()*+,\-./:;<=>?\[\\\]^{|}~]
 {FLOAT}             { checkNumber(yytext, 0); }      
 {INT}               { checkNumber(yytext, 10); } 
 {INVALID_NUMBER}    { yyerror("Invalid number"); }
+
+    /*********** Keywords **********/
+{KEYWORDS}          { checkKeyword(yytext); }
 
     /*********** Identifier **********/
 {IDENTIFIER}        { checkIdentifier(yytext); }

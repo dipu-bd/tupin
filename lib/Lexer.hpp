@@ -39,3 +39,8 @@ void checkOperator(const char* s)
 {
     printf("~ OP: %s\n", s);
 }
+
+void checkKeyword(const char* s)
+{
+    printf("~ KEYWORD: %s\n", s);
+}

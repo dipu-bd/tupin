@@ -34,7 +34,8 @@ IDENTIFIER      [_$A-Za-z][_$0-9A-Za-z]*
 
 KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"|"or"|"not"|"xor"
 
-%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     /*********** Declarations **********/ 
     StringBuilder __builder;
     printf("%3d. ", yylineno);
@@ -94,7 +95,7 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 .                   { yyerror("Unrecognized Character"); }
 <*>\n               { loc.col = 0; printf("\n%3d. ", yylineno); }
 
-%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 int main(int argc, char** argv) 
 { 

@@ -5,7 +5,7 @@
 
 Location loc;
 Environment env;
- 
+
 void yyerror(const char *s)
 {
     fprintf(stderr, "# %s:%d:%d: %s %s\n", env.input(), loc.line, loc.col, s, yytext);
@@ -35,12 +35,12 @@ void checkIdentifier(const char *s)
     printf("~ ID: %s\n", s);
 }
 
-void checkOperator(const char* s) 
+void checkOperator(const char *s)
 {
     printf("~ OP: %s\n", s);
 }
 
-void checkKeyword(const char* s)
+void checkKeyword(const char *s)
 {
     printf("~ KEYWORD: %s\n", s);
 }

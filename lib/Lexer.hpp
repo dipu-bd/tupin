@@ -27,7 +27,7 @@ void checkNumber(const char *s, int base = 10)
 
 void checkString(const char *s)
 {
-    printf("~ STRING: \"%s\"\n", s);
+    printf("~ STRING: %s\n", s);
 }
 
 void checkIdentifier(const char *s)

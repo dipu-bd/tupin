@@ -49,28 +49,29 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 }
 
     /*********** Strings **********/ 
-<INITIAL>\'         { BEGIN(sqstr); __builder.init(); }
-<INITIAL>\"         { BEGIN(dqstr); __builder.init(); }
+<INITIAL>"\'"       { BEGIN(sqstr); __builder.init(); }
+<INITIAL>"\""       { BEGIN(dqstr); __builder.init(); }
 <sqstr,dqstr>{
-    {ESCAPE}            { if(!__builder.escaped(yytext)) 
-                            yyerror("Bad escape sequence"); }
-    {BADESC}            { yyerror("Unrecognized escape sequence"); }    
+    {ESCAPE}        { if(!__builder.escaped(yytext)) 
+                        yyerror("Bad escape sequence"); }
+    {BADESC}        { yyerror("Unrecognized escape sequence"); 
+                      __builder.append(yytext + 1, yyleng - 1); }    
 }
 <sqstr>{
-    [^\\']*             { __builder.append(yytext, yyleng); }    
-    "'"                 {   BEGIN(INITIAL); 
-                        __builder.append(yytext, yyleng - 1); 
-                        checkString(__builder.str);  }
+    [^\\']*         { __builder.append(yytext, yyleng); }    
+    "'"             { BEGIN(INITIAL); 
+                      __builder.append(yytext, yyleng - 1); 
+                      checkString(__builder.str);  }
 }
 <dqstr>{
-    [^\\"]*             { __builder.append(yytext, yyleng); }    
-    \"                  {   BEGIN(INITIAL); 
-                        __builder.append(yytext, yyleng - 1); 
-                        checkString(__builder.str); }
+    [^\\"]*         { __builder.append(yytext, yyleng); }    
+    "\""            { BEGIN(INITIAL); 
+                      __builder.append(yytext, yyleng - 1); 
+                      checkString(__builder.str); }
 }
 
     /*********** Whitespaces **********/
-[ \t\r]+		    /* skip whitespace */
+{SPACE}		        /* skip whitespace */
 
     /*********** Operator **********/
 {OPERATOR}          { checkOperator(yytext); }

@@ -10,6 +10,8 @@ TEST_PATH="$SOURCE_PATH/test"
 PROGRAM_FILE="$BUILD_PATH/Program.exe"
 
 #################################################
+
+noecho
  
 function compile
 {
@@ -28,7 +30,9 @@ function compile
     flex -o"$BUILD_PATH/Lexer.cpp" "$SOURCE_PATH/Lexer.l"
 
     echo "Compiling C++ file..."
-    g++ -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp"
+    g++ -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" 
+
+    echo "---------------- DONE ------------------"
 }
 
 function run
@@ -36,16 +40,30 @@ function run
     compile
 
     echo "Starting program..."
-    "./$PROGRAM_FILE"
+    echo "----------------------------------------"
+    if [ -f "./$PROGRAM_FILE" ]; then
+        "./$PROGRAM_FILE"
+    else 
+        echo "No program file."
+        exit 1
+    fi  
 }
 
 function test 
 {
     compile
 
+    echo "Compiling tests..."
+    g++ -std=gnu++11 -o "$BUILD_PATH/Test.exe" "$TEST_PATH/Test.cpp"
+
     echo "Running tests..."
-    g++ -std=gnu++11 -o ".build/Test.exe" "$TEST_PATH/Test.cpp"
-    "./$BUILD_PATH/Test.exe"
+    echo "----------------------------------------"
+    if [ -f "$BUILD_PATH/Test.exe" ]; then
+        "./$BUILD_PATH/Test.exe"
+    else 
+        echo "No program file."
+        exit 1
+    fi 
 }
 
 function help

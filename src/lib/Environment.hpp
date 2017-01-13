@@ -25,19 +25,21 @@ struct Environment
         }
         return "";
     }
-    void openInput() const
+    FILE* openInput() const
     {
         if (argc >= 1)
         {
-            yyin = fopen(argv[1], "r");
+            return fopen(argv[1], "r");
         }
+        return 0;
     }
-    void openOutput() const
+    FILE* openOutput() const
     {
         if (argc >= 2)
         {
-            yyout = fopen(argv[2], "w");
+            return fopen(argv[2], "w");
         }
+        return 0;
     }
     
     void showTime() const

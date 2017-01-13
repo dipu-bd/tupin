@@ -2,36 +2,39 @@
     #include "lib/Lexer.hpp"
     #define YY_USER_ACTION { loc.col += (int)yyleng; loc.line = yylineno; }
 %}
- 
+
+%option warn
 %option noyywrap
 %option yylineno
-%option warn 
 
 %x comment
 %x sqstr dqstr
 
+    /* Whitespace */
 SPACE           [ \t\r\v\f]
-
+    /* Numbers and Digits */
 DIGIT           [0-9]
+LETTER          [_$A-Za-z]
 XDIGIT          [A-Fa-f0-9]
-INT             [-]?{DIGIT}+
-FLOAT           {INT}"."{DIGIT}*  
-EFLOAT          ({FLOAT}|{INT})[eE][+-]?{DIGIT}+
-HEXA            [-]?0[xX]{XDIGIT}+
-OCTA            [-]?0[oO][0-7]+
-BIN             [-]?0[bB][01]+
-INVALID_NUMBER  ({BIN}|{OCTA}|{HEXA}|{EFLOAT}|{FLOAT}|{INT})[[:alnum:]]+
-
+    /* Valid operators */
+OPERATOR        [!%&()*+,\-./:;<=>?^{|}~\[\]\\]
+    /* Escape sequence */
 ESC1            [^xX0-7]
 ESC2            [0-7]{1,3}
 ESC3            [xX]{XDIGIT}{1,2}
 ESCAPE          \\({ESC1}|{ESC2}|{ESC3})
 BADESC          \\({DIGIT}+|[xX])
-
-OPERATOR        [!%&()*+,\-./:;<=>?\[\]^{|}~]
-
-IDENTIFIER      [_$A-Za-z][_$0-9A-Za-z]*
-
+    /* Number system */
+INT             {DIGIT}+
+FLOAT           {INT}"."{DIGIT}*  
+EFLOAT          ({FLOAT}|{INT})[eE][+-]?{DIGIT}+
+HEXA            0[xX]{XDIGIT}+
+OCTA            0[oO][0-7]+
+BIN             0[bB][01]+
+INVALID_NUMBER  ({BIN}|{OCTA}|{HEXA}|{EFLOAT}|{FLOAT}|{INT})[[:alnum:]]+
+    /* Identifier */
+IDENTIFIER      {LETTER}({LETTER}|{DIGIT})*
+    /* Valid keywords */
 KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"|"or"|"not"|"xor"
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,7 +44,7 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
     printf("%3d. ", yylineno);
     
     /*********** Comments **********/
-<INITIAL>"//"[^\n]*     /* eat up single line comment */
+"//"[^\n]*          /* eat up single line comment */
 <INITIAL>"/*"       { BEGIN(comment); }
 <comment>{
     [^*\n]*         /* eat anything that's not a '*' */
@@ -101,8 +104,9 @@ int main(int argc, char** argv)
 { 
     /* Open input and output files for testing */
     env = Environment(argc, argv);  
-    env.openInput();
-    env.openOutput();
+    yyin = env.openInput();
+    yyout = env.openOutput();
+    if(yyout) stdout = yyout;
     
     /* start lexer */
     yylex();

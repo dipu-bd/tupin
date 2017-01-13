@@ -43,7 +43,7 @@ void runTests(bool failSafe, PFS all_tests[])
 int main(int argc, char **argv)
 {
     PFS all_tests[] = {
-        {&testData, "testData"},
+        {&testNumber, "testNumber"},
         {0, "null"},
     };
     runTests(FAILE_SAFE_MODE, all_tests);

@@ -2,13 +2,43 @@
 using namespace tupin;
 using namespace std;
 
-void testData()
+void testNumber()
 {
-    Number a(20);
+    int oa = 20;
+    int ob = 22;
+    Number a(oa);
     Number b(22);
+
+    assert(a == oa);
+    assert(ob == b);
+
     Number r = a + b;
     assert(r == 42);
-    assert(string(r) == "42"); 
+    assert(string(r) == "42");
+
+    assert(a != b);
+
+    assert(-a == -oa);
+    assert(a + b == oa + ob);
+    assert(a - b == oa - ob);
+    assert(a * b == oa * ob);
+    assert(a / b == oa / ob);
+    assert(a % b == oa % ob);
+
+    assert((~a) == (~oa));
+    assert((a | b) == (oa | ob));
+    assert((a ^ b) == (oa ^ ob));
+    assert((a & b) == (oa & ob));
+    assert((a >> 3) == (oa >> 3));
+    assert((a << 3) == (oa << 3));
+
+    assert((!b) == (!ob));
+    assert((a || b) == (oa || ob));
+    assert((a && b) == (oa && ob));
+
+    //a += b;
+    //assert(a == 42);
+    //assert((a -= b) == 20);
 }
 
 void testTypes()

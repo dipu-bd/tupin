@@ -30,7 +30,7 @@ function compile
     flex -o"$BUILD_PATH/Lexer.cpp" "$SOURCE_PATH/Lexer.l"
 
     echo "Compiling C++ file..."
-    g++ -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" 
+    g++ -rdynamic -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" 
 
     echo "---------------- DONE ------------------"
 }

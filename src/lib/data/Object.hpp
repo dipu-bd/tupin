@@ -1,21 +1,23 @@
 namespace tupin
 {
-#define OBJECT_BASE
+#define OBJECT
 
 template <typename T>
-class ObjectBase
+class Object
 {
   protected:
     T __value;
 
   public:
-    ObjectBase(const T &v) : __value(v) {}
+    Object(const T &v) : __value(v) {}
     operator T() const { return __value; }
 
-    const T &__get() const;
-    ObjectBase<T> &__set(const T &);
-
     operator std::string() const;
+
+    const T &get() const;
+    Object<T> &set(const T &);
+
+    int compareTo(const Object<T> &) const;
 };
 
 //-------------------------------------------------------------------------
@@ -23,22 +25,36 @@ class ObjectBase
 //-------------------------------------------------------------------------
 
 template <typename T>
-const T &ObjectBase<T>::__get() const
+Object<T>::operator std::string() const
+{
+    return std::to_string(__value);
+}
+
+template <typename T>
+const T &Object<T>::get() const
 {
     return __value;
 }
 
 template <typename T>
-ObjectBase<T> &ObjectBase<T>::__set(const T &v)
+Object<T> &Object<T>::set(const T &v)
 {
     __value = v;
     return *this;
 }
 
 template <typename T>
-ObjectBase<T>::operator std::string() const
+int Object<T>::compareTo(const Object<T> &n) const
 {
-	return std::to_string(__value);
+    if (get() < n.get())
+    {
+	return -1;
+    }
+    if (n.get() < get())
+    {
+	return 1;
+    }
+    return 0;
 }
 
 // end of file

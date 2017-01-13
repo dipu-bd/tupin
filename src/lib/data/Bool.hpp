@@ -5,15 +5,8 @@ namespace tupin
 class Bool : public Object<bool>
 {
   public:
-    Bool(bool val = false) : Object(val) {}
-
-    operator std::string() const;
+    Bool(bool val = false) : Object(val) {} 
 };
-
-Bool::operator std::string() const
-{
-    return get() ? "true" : "false";
-}
 
 // end of file
 }

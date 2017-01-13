@@ -18,7 +18,7 @@ void testBool()
     assert(a != b);
     assert(a || b);
     assert(!(a && b));
-
+    
     assert("true" == string(a));
     assert("false" == string(b));
 }

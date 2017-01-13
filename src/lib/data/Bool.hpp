@@ -1,6 +1,6 @@
 namespace tupin
 {
-#define NUMBER
+#define BOOLEAN
 
 class Bool : public Object<bool>
 {

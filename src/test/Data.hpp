@@ -2,6 +2,11 @@
 using namespace tupin;
 using namespace std;
 
+void testString()
+{
+    
+}
+
 void testNumber()
 {
     int oa = 20;
@@ -25,6 +30,12 @@ void testNumber()
     assert(a / b == oa / ob);
     assert(a % b == oa % ob);
 
+    assert(a + ob == oa + ob);
+    assert(a - ob == oa - ob);
+    assert(a * ob == oa * ob);
+    assert(a / ob == oa / ob);
+    assert(a % ob == oa % ob);
+
     assert((~a) == (~oa));
     assert((a | b) == (oa | ob));
     assert((a ^ b) == (oa ^ ob));
@@ -32,16 +43,32 @@ void testNumber()
     assert((a >> 3) == (oa >> 3));
     assert((a << 3) == (oa << 3));
 
+    assert((oa | b) == (oa | ob));
+    assert((oa ^ b) == (oa ^ ob));
+    assert((oa & b) == (oa & ob));
+
     assert((!b) == (!ob));
     assert((a || b) == (oa || ob));
     assert((a && b) == (oa && ob));
+    assert((oa || b) == (oa || ob));
+    assert((a && ob) == (oa && ob));
+        
+    a += b;
+    assert(a == oa + ob);
+    assert((a -= b) == oa);
+    assert((a *= b) == oa*ob);
+    assert((a /= b) == oa);
 
-    //a += b;
-    //assert(a == 42);
-    //assert((a -= b) == 20);
+    assert((r %= a) == (a + b) % oa);
+    
+    r = a; assert((r ^= b) == (oa ^ ob));
+    r = a; assert((r |= b) == (oa | ob));
+    r = a; assert((r &= b) == (oa & ob));
+    r = a; assert((r >>= 3) == (oa >> 3));
+    r = a; assert((r <<= 3) == (oa << 3));
 }
 
-void testTypes()
+void printTypes()
 {
     cout << typeid(int).name() << endl;
     cout << typeid(signed char).name() << endl;

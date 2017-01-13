@@ -4,7 +4,23 @@ using namespace std;
 
 void testString()
 {
+
+}
+
+void testBool()
+{
+    Bool a(true);
+    Bool b(false);
     
+    assert(a);
+    assert(!b);
+
+    assert(a != b);
+    assert(a || b);
+    assert(!(a && b));
+
+    assert("true" == string(a));
+    assert("false" == string(b));
 }
 
 void testNumber()

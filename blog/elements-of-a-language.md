@@ -2,11 +2,11 @@
  
 - Comments
 - Variables
--	Keywords
--	Operators
--	*Data structures*
--	*Control structures*
--	*Functions*
+- Keywords
+- Operators
+- *Data structures*
+- *Control structures*
+- *Functions*
 
 ### Data Structures
 - **Types**: integer, float, boolean, enum, string, array, structure.
@@ -16,13 +16,13 @@
 
 ### Control structures 
 - **Single statement**: single-line, multi-line.
--	**Compound statements**: grouped in single-line, block of statements, scope.
--	**Selection statements**: `if-elif-else`
--	**Iteration statements**: `for` loop
+- **Compound statements**: grouped in single-line, block of statements, scope.
+- **Selection statements**: `if-elif-else`
+- **Iteration statements**: `for` loop
 
 ###	Function
 - Declaration
--	Global structure
--	Argument passing
--	Array parameters 
+- Global structure
+- Argument passing
+- Array parameters 
 - Invoking function

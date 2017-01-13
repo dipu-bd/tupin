@@ -1,13 +1,16 @@
-rx = "[a-z]+"   // compile and assign the regular expression to variable rx.
+/* compile and assign the regular expression to variable rx. */
+regex = "[a-z]+";   
+
+/* a function definition */
 def gen() {
-  len = rand(1, 10)
-  return randrx(len, rx)  // generates random string of len length from regular expression.
+  len = rand(1, 10);  
+  return randrx(len, regex);  // generates random string of len length from regular expression.
 }
 
-T = rand(1,50)
-[T]
+[T = rand(1,50)];
 for range(T-1) {
-  m = rand(1,10000)
-  ['\n' m]
-  for range(m-1) : ['\n' gen() ' ' gen()]     // single line looping
+  ['\n' m = rand(1,10000)];
+  for range(m-1) {
+    ['\n' gen() ' ' gen()];     // single line looping
+  }
 }

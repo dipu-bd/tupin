@@ -19,18 +19,16 @@ Each case starts with a line containing two integers a and b. a denotes the numb
 
 ***tupin*** **code**     
 ```c++
-T = rand(1,125)
-['T']
-for range(T-1) : [\n'rand(0,10)' 'rand(0,10)']
+/* LightOJ 10000 */
+
+T = rand(100,125); // get a random between 100 and 125, inclusive
+[T];    // prints T
+
+/* loops from 0 to T - 1 */
+for range(T-1) { 
+    ['\n' rand(0,10) ' ' rand(0,10)];   // prints two space separated numbers
+}
 ```
-
-**Explanation**     
-
-- Each third brackets pair is a print command which prints the content inside the brackets exactly as it appears.
-- `rand` is a function which returns a random value.
-- You can use single quotes inside third brackets to execute a code and print it. Similarly the variable T was printed.
-- `for` indicates the start of a loop. Next should be either a variable or a range. A rangle must be defined in the loop (like python, except it is inclusive).
-- Every single line is one statement. Statesments can be grouped together with curly brackets. Use semicolon to use multiple statesment in a single line.
 
 ---
 All the description is of initial plan. It is subject to change with development process.

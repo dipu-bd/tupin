@@ -3,26 +3,21 @@
  */
 def main() {
   // test case
-  T = rand(1,20)
-  [T]
-  
-  for range(T-1) {    // no index variable is defined. 
-    n = rand(1,500)
-    m = rand(0, 16000)  
-    ['\n\n']
-    [n ' ' m]
-    
+  [T = rand(1,20)];
+
+  for range(T-1) {    // no index variable is defined.     
+    [
+      '\n\n'
+      n = rand(1,500)
+      ' '
+      m = rand(0, 16000)
+    ];        
     for i range(m-1) {  // index variable i is local to this scope only.
       /* 
        Generates a random pair
       */ 
-      edge = getPair(n)
-      ['\n']   
-      [edge[0]]  // u = first element of the array
-      [' ']
-      [edge[1]]  // v = second element of the array
-      [' ']
-      [rand(1,20000)]   // weight 
+      edge = getPair(n);
+      ['\n' edge[0] ' ' edge[1] ' ' rand(1,20000)];
     }
   }
 }
@@ -31,12 +26,12 @@ def main() {
   takes a number n and returns a random pair of two different number in range [0, n-1]
  */
 def getPair(n) {
-  u = rand(0,n-1)
-  v = rand(0, n-1, array(u))  // a random number other than u
-  return array(u, v)          // returns an array of two elements 
+  u = rand(0,n-1);
+  v = rand(0, n-1, array(u));  // a random number other than u
+  return array(u, v);          // returns an array of two elements 
 }
 
 /* 
   Calls main function to start executing the script 
  */
-main()
+main();

@@ -1,7 +1,7 @@
 T = rand(1,125)
-['T']
+[T]
 for range(T-1) {
     n = rand(0,10)
     m = rand(0,10)
-    [\n'n' 'm']
+    ['\n' n ' ' m]
 }

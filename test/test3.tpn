@@ -10,7 +10,7 @@ def main() {
     n = rand(1,500)
     m = rand(0, 16000)  
     ['\n\n']
-    [n' 'm]
+    [n ' ' m]
     
     for i range(m-1) {  // index variable i is local to this scope only.
       /* 

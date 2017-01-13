@@ -1,5 +1,5 @@
 %{
-    #include "lib/Lexer.hpp"
+    #include "lib/compiler/Lexer.hpp"
     #define YY_USER_ACTION { loc.col += (int)yyleng; loc.line = yylineno; }
 %}
 

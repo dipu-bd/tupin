@@ -1,7 +1,12 @@
-#include "Object.hpp"
+namespace tupin
+{
+#define NUMBER
 
-class Number : public Object
+class Number : public ObjectBase<long long>
 {
   public:
-    virtual std::string toString(const char *fmt) const = 0;
+    Number(long long val = 0) : ObjectBase(val) {}
 };
+
+// end of file
+}

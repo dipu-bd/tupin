@@ -6,18 +6,18 @@
 %token STRING INT FLOAT ID 
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
 
+%union
+{
+
+}
+
 %%
 Program: Program Block 
     | Program Function
     |
     ;
 
-Block : Loop
-    | Condition
-    | Statement 
-    ;
-
-Function: DEF ID '(' Arguments ')' '{' block '}'
+Function: DEF ID '(' Arguments ')' '{' Block '}'
     ;    
 
 Arguments:  /* can be empty */
@@ -34,15 +34,41 @@ ArgAsnList: Variable '=' Literal
     | ArgAsnList ',' Variable '=' Literal
     ;
 
+
+Block : Loop
+    | Condition
+    | Statement 
+    ;
+
+Statement: SingleStmnt ';' 
+    | '{' Block '}'
+    ;
+
+SingleStmnt: PrintStmnt
+    | Expression
+    | Declaration
+    ;
+
+PrintStmnt: '[' PrintSequence ']'
+    ;
+
+Loop: 
+    ;
+
 Variable: ID
     ;
 
-Literal: INT
-    | FLOAT
+Literal: Number
     | STRING 
     | Array
     ;
 
+Number: INT
+    | FLOAT
+    ;
+
+Array: 
+    ;
 
 %% 
 

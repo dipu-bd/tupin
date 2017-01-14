@@ -53,13 +53,10 @@ SingleStmnt: Declaration
     ;
 
     /*---------------------------------_ 
-    |             Declarations          |
+    |      Variable  Declarations       |
      *----------------------------------*/    
 
 Declaration: ID '=' Expression
-    ;
-
-Array: '{' ParamList '}'
     ;
 
     /*---------------------------------_ 
@@ -76,21 +73,58 @@ PrintSequence: /* can be empty */
     ;
 
     /*---------------------------------_ 
-    |          Control Block            |
-     *----------------------------------*/    
-Condition:
+    |             Conditions            |
+     *----------------------------------*/         
+Condition: IF '(' Expression ')' Block Branch
+    | IF '[' ID ']' '{' Switch '}' 
     ;
 
-Loop: 
+Branch: /* can be empty */
+    | ELSE Block
+    | ELIF '(' Expression ')' Block Branch
+    ;
+
+Switch: Choice
+    | Switch ',' Choice
+    ;
+
+Choice: Literal ':' '{' Block '}' 
+    ;
+
+    /*---------------------------------_ 
+    |               Looping             |
+     *----------------------------------*/    
+Loop: FOR '(' Expression ')' '{' Block '}'
+    | FOR '(' Declaration ';' Expression ';' Expression ')' '{' Block '}'
+    | FOR '[' LoopIterator ']' '{' Block '}'
+    | FOR '[' ID LoopIterator ']' '{' Block '}'
+    ;
+
+LoopIterator: 
+    | Literal TO Literal
+    | Literal TO Literal BY Literal
+    | Expression
     ;
 
     /*---------------------------------_ 
     |         Function Call             |
      *----------------------------------*/    
-FunctionCall: 
+FunctionCall: ID '(' ParamList ')'
     ;
 
-ParamList:
+ParamList: /* can be empty */
+    | Params
+    ;
+
+Params: Expression
+    | Params ',' Expression
+    ;
+
+    /*---------------------------------_ 
+    |        Array Definition           |
+     *----------------------------------*/    
+
+Array: '{' ParamList '}'
     ;
 
     /*---------------------------------_ 

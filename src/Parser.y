@@ -1,9 +1,11 @@
 %{
     #include <bits/stdc++.h>
-    #include "lib/compiler/Parser.hpp"
-    Location loc;
-    Environment env;
+    #include "lib/compiler/Parser.hpp"    
+    Environment env;    
 %}
+
+%define api.pure
+%locations
 
 %token BOOL INT FLOAT
 %token FOR CONTINUE BREAK
@@ -18,7 +20,20 @@
 %left '<' '>' LE GE EQ NE LT GT
 %%
 
-%%
+program: program '\n' { printf("ONE LINER\n"); }
+    |   /* empty statement */
+    ;
+
+%% 
+
+void yyerror(const char *msg)
+{
+    fprintf(stderr, "%s:%d:%d: %s\n", 
+        env.input(),
+        yylloc.last_line,
+        yylloc.last_column,
+        msg);
+}
 
 int main(int argc, char *argv[])
 {
@@ -30,6 +45,8 @@ int main(int argc, char *argv[])
 	
 	fclose(yyin);
     fclose(yyout);
+
+    env.showTime();
 
     return 0;
 }

@@ -46,6 +46,6 @@ struct Environment
     { 
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
-        printf("\n\nRuntime: %f ms\n", duration / 1e6);
+        fprintf(stderr, "\n\nRuntime: %f ms\n", duration / 1e6);
     }
 };

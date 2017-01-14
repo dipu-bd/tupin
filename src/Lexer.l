@@ -1,6 +1,7 @@
 %{    
     #include "Parser.hpp"
-    #include "lib/Lexer.hpp"
+    #include "lib/compiler/Lexer.hpp"
+    #include "lib/compiler/StringBuilder.hpp"
 
     offset_t offset;
     extern YYLTYPE yylloc;

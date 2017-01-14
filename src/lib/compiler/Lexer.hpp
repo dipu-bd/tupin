@@ -1,14 +1,3 @@
-#include "Location.hpp"
-#include "Environment.hpp"
-#include "StringBuilder.hpp"
-
-Location loc;
-Environment env;
-
-void yyerror(const char *s)
-{
-    fprintf(stderr, "# %s:%d:%d: %s %s\n", env.input(), loc.line, loc.col, s, yytext);
-}
 
 #ifdef DEBUG
 int RETURN(int id, const char* text) 

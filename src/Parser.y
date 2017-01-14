@@ -13,11 +13,17 @@
 }
 
 %%
+    /*---------------------------------_ 
+    |            Start Point            |
+     *----------------------------------*/    
 Program: Program Block 
     | Program Function
     |
     ;
 
+    /*---------------------------------_ 
+    |       Functoin Definition         |
+     *----------------------------------*/    
 Function: DEF ID '(' Arguments ')' '{' Block '}'
     ;    
 
@@ -28,7 +34,10 @@ Arguments:  /* can be empty */
 ArgVarList: ID
     | ArgVarList ',' ID
     ; 
-
+    
+    /*---------------------------------_ 
+    |        Block's Definition         |
+     *----------------------------------*/     
 Block : Loop
     | Condition
     | Statement 
@@ -43,9 +52,19 @@ SingleStmnt: Declaration
     | Expression
     ;
 
+    /*---------------------------------_ 
+    |             Declarations          |
+     *----------------------------------*/    
+
 Declaration: ID '=' Expression
     ;
 
+Array: '{' ParamList '}'
+    ;
+
+    /*---------------------------------_ 
+    |         Print Statement           |
+     *----------------------------------*/    
 PrintStmnt: '[' PrintSequence ']'
     ;
 
@@ -56,25 +75,35 @@ PrintSequence: /* can be empty */
     | PrintSequence Expression
     ;
 
+    /*---------------------------------_ 
+    |          Control Block            |
+     *----------------------------------*/    
 Condition:
     ;
 
 Loop: 
     ;
 
-Array: '{' ParamList '}'
+    /*---------------------------------_ 
+    |         Function Call             |
+     *----------------------------------*/    
+FunctionCall: 
     ;
 
-Expression:
+ParamList:
+    ;
+
+    /*---------------------------------_ 
+    |            Expression             |
+     *----------------------------------*/    
+Expression: Literal
+    | Number
+    | ID 
+    | 
     ;
     
-Variable: ID
-    ;
-
 Literal: Number
-    | STRING 
-    | Array
-    | ID
+    | STRING
     ;
 
 Number: INT

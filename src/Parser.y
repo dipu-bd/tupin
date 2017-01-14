@@ -1,24 +1,15 @@
 %{
     #include <bits/stdc++.h>
-    #include "lib/compiler/Parser.hpp"
+    #include "lib/Util.h"
 %}
 
 %define api.pure
 %locations
 
-%token BOOL INT FLOAT
-%token FOR CONTINUE BREAK
-%token IF ELIF ELSE
-%token ID 
-%token DEF
-%token DOT
-%token STRING
+%token OP PWR PWREQ
+%token STRING INT FLOAT ID 
+%token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
 
-
-    /* EQ NE LE GE OR AND SHL SHR INC DEC PE ME CE DE MDE PWR SHLE SHRE PWRE RAND OE XE AE */
-%right '='
-%left AND OR
-%left '<' '>' LE GE EQ NE
 %%
 
 program: program '\n' { printf("ONE LINER\n"); }
@@ -26,6 +17,7 @@ program: program '\n' { printf("ONE LINER\n"); }
     ;
 
 %% 
+#include "lib/Lexer.h"
 
 int main(int argc, char *argv[])
 {

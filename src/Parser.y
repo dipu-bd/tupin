@@ -1,6 +1,7 @@
 %{ 
     #include "lib/ParserHelper.hpp"
 %}
+
  
 %token OP PWR PWREQ THREEDOT
 %token STRING INT FLOAT ID 
@@ -8,7 +9,7 @@
 
 %union
 {
-
+    Token token
 }
 
 %%
@@ -22,18 +23,11 @@ Function: DEF ID '(' Arguments ')' '{' Block '}'
 
 Arguments:  /* can be empty */
     | ArgVarList 
-    | ArgAsnList
-    | ArgVarList ',' ArgAsnList
     ;
 
-ArgVarList: Variable
-    | ArgVarList ',' Variable
-    ;
-
-ArgAsnList: Variable '=' Literal
-    | ArgAsnList ',' Variable '=' Literal
-    ;
-
+ArgVarList: ID
+    | ArgVarList ',' ID
+    ; 
 
 Block : Loop
     | Condition
@@ -44,45 +38,54 @@ Statement: SingleStmnt ';'
     | '{' Block '}'
     ;
 
-SingleStmnt: PrintStmnt
+SingleStmnt: Declaration
+    | PrintStmnt
     | Expression
-    | Declaration
+    ;
+
+Declaration: ID '=' Expression
     ;
 
 PrintStmnt: '[' PrintSequence ']'
     ;
 
+PrintSequence: /* can be empty */
+    | STRING
+    | Expression
+    | PrintSequence STRING
+    | PrintSequence Expression
+    ;
+
+Condition:
+    ;
+
 Loop: 
     ;
 
+Array: '{' ParamList '}'
+    ;
+
+Expression:
+    ;
+    
 Variable: ID
     ;
 
 Literal: Number
     | STRING 
     | Array
+    | ID
     ;
 
 Number: INT
     | FLOAT
     ;
 
-Array: 
-    ;
-
 %% 
 
-int main(int argc, char *argv[])
+int main(int argc, char** argv)
 {
-    auto begin = std::chrono::high_resolution_clock::now();
-    init(argc, argv);    
-
-    int res = yyparse();
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
-    fprintf(stderr, "\n\nExited with status %d.\nRuntime: %f ms\n", res, duration / 1e6);
-    return 0;
+    return MainFunction(argc, argv);
 }
 
 /*

@@ -11,23 +11,21 @@ class Object
   public:
     Object(const T &v) : __value(v) {}
     operator T() const { return __value; }
-
-    operator std::string() const;
-
+ 
     const T &get() const;
     void set(const T &);
 
-    int compareTo(const Object<T> &) const;
+    const char *str() const;
 };
 
 //-------------------------------------------------------------------------
 // Member function definitions
 //-------------------------------------------------------------------------
-
+ 
 template <typename T>
-Object<T>::operator std::string() const
+const char *Object<T>::str() const
 {
-    return std::to_string(__value);
+    return to_string(__value).data();
 }
 
 template <typename T>
@@ -39,21 +37,7 @@ const T &Object<T>::get() const
 template <typename T>
 void Object<T>::set(const T &v)
 {
-    __value = v; 
-}
-
-template <typename T>
-int Object<T>::compareTo(const Object<T> &n) const
-{
-    if (get() < n.get())
-    {
-	return -1;
-    }
-    if (n.get() < get())
-    {
-	return 1;
-    }
-    return 0;
+    __value = v;
 }
 
 // end of file

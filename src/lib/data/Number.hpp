@@ -2,47 +2,64 @@ namespace tupin
 {
 #define NUMBER
 
-class Number : public Object<long long>
+union NumberUnion
 {
-  public:
-    Number(long long val = 0) : Object(val) {} 
+    double f;
+    long long int i;
 
-    Number& operator += (const Number& rhs);
-    Number& operator -= (const Number& rhs);
-    Number& operator *= (const Number& rhs);
-    Number& operator /= (const Number& rhs);
-    Number& operator %= (const Number& rhs);
-
-    Number& operator ^= (const Number& rhs);
-    Number& operator |= (const Number& rhs);
-    Number& operator &= (const Number& rhs);
-    Number& operator >>= (const Number& rhs);
-    Number& operator <<= (const Number& rhs); 
+    operator double() { return f; }
+    operator long long int() { return i; }
 };
 
-// Arithmatic Operations 
+class Number : NumberUnion
+{
+  public:
+    Number(double val = 0) : Object(val) {}
+    Number(long long val = 0) : Object(val) {}
 
-Number& Number::operator += (const Number& rhs)
+    operator std::string() const;
+
+    Number &operator+=(const Number &rhs);
+    Number &operator-=(const Number &rhs);
+    Number &operator*=(const Number &rhs);
+    Number &operator/=(const Number &rhs);
+    Number &operator%=(const Number &rhs);
+
+    Number &operator^=(const Number &rhs);
+    Number &operator|=(const Number &rhs);
+    Number &operator&=(const Number &rhs);
+    Number &operator>>=(const Number &rhs);
+    Number &operator<<=(const Number &rhs);
+};
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+Number::operator std::string() const
+{
+    return std::to_string(value);
+}
+
+Number &Number::operator+=(const Number &rhs)
 {
     set(get() + rhs.get());
     return *this;
 }
-Number& Number::operator -= (const Number& rhs)
+Number &Number::operator-=(const Number &rhs)
 {
     set(get() - rhs.get());
     return *this;
 }
-Number& Number::operator *= (const Number& rhs)
+Number &Number::operator*=(const Number &rhs)
 {
     set(get() * rhs.get());
     return *this;
 }
-Number& Number::operator /= (const Number& rhs)
+Number &Number::operator/=(const Number &rhs)
 {
     set(get() / rhs.get());
     return *this;
 }
-Number& Number::operator %= (const Number& rhs)
+Number &Number::operator%=(const Number &rhs)
 {
     set(get() % rhs.get());
     return *this;
@@ -50,31 +67,31 @@ Number& Number::operator %= (const Number& rhs)
 
 // Bit Operations
 
-Number& Number::operator ^= (const Number& rhs)
+Number &Number::operator^=(const Number &rhs)
 {
     set(get() ^ rhs.get());
     return *this;
 }
-Number& Number::operator |= (const Number& rhs)
+Number &Number::operator|=(const Number &rhs)
 {
     set(get() | rhs.get());
     return *this;
 }
-Number& Number::operator &= (const Number& rhs)
+Number &Number::operator&=(const Number &rhs)
 {
     set(get() & rhs.get());
     return *this;
 }
-Number& Number::operator <<= (const Number& rhs)
+Number &Number::operator<<=(const Number &rhs)
 {
     set(get() << rhs.get());
     return *this;
 }
-Number& Number::operator >>= (const Number& rhs)
+Number &Number::operator>>=(const Number &rhs)
 {
     set(get() >> rhs.get());
     return *this;
-} 
+}
 
 // end of file
 }

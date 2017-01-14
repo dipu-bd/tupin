@@ -2,14 +2,13 @@ namespace tupin
 {
 #define STRING
 
-class String : public Object<char *>
+class String : public virtual Object<char *>
 {
   protected:
+  	char* __value;
     size_t __len;
 
-  public:
-    ~String() 	{ delete __value; }
-
+  public: 
 	String() : Object(new char[0]) { set(""); } 
 	template<typename M> String(const M& v) : Object(new char[0]) {	set(v); } 
 
@@ -17,24 +16,25 @@ class String : public Object<char *>
     size_t 	size() const;
     char 	at(size_t) const;
 	String&	repeat(unsigned short);
-
+	 
     char&	operator[](size_t i);    	
 	String&	operator*=(unsigned short);
     String 	operator*(unsigned short)const;		
- 
-    template<typename M> void 		set(const M&);
 
-    template<typename M> String&	append(const M&);    
-	template<typename M> String&	operator=(const M&);
-    template<typename M> String&	operator+=(const M&);	
-    template<typename M> String		operator+(const M&) const;
+    template<typename M> void 	set(const M&);
+    template<typename M> String &append(const M&);    
 
-    template<typename M> bool operator<(const M&) const;
-    template<typename M> bool operator>(const M&) const;
-    template<typename M> bool operator==(const M&) const;
-    template<typename M> bool operator!=(const M&) const;
-    template<typename M> bool operator<=(const M&) const;
-    template<typename M> bool operator>=(const M&) const;
+	template<typename M> String &operator=(const M&);
+    template<typename M> String &operator+=(const M&);	
+    template<typename M> String	operator+(const M&) const;
+
+	template<typename M> int	compareTo(const M&) const;
+    template<typename M> bool 	operator<(const M&) const;
+    template<typename M> bool 	operator>(const M&) const;
+    template<typename M> bool 	operator==(const M&) const;
+    template<typename M> bool 	operator!=(const M&) const;
+    template<typename M> bool 	operator<=(const M&) const;
+    template<typename M> bool 	operator>=(const M&) const;
 
 /*
 	// Input from stream
@@ -49,18 +49,10 @@ class String : public Object<char *>
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-template <typename T> std::string to_string(T value)
-{
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
-}
-
 void String::clear()
 {
-    __len = 0;
-    if (__value)
-		delete __value;
+    __len = 0;  
+	delete __value;
 }
 
 template<typename M>
@@ -102,11 +94,10 @@ String& String::repeat(unsigned short n)
 		{
 			std::strcat(tmp, __value); // adds one
 		}
-    }
-
-    delete __value; // free old value
-    __value = tmp;
-    __len *= n;
+    } 
+	clear();
+	__value = tmp;
+	__len = __len * n;
     return *this;
 }
 
@@ -151,47 +142,47 @@ String String::operator*(unsigned short n) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-
 template<typename M>
-bool String::operator<(const M& r) const
-{
-	std::string s = to_string(r);
-    return std::strcmp(__value, s.data()) < 0;
-}
-
-template<typename M>
-bool String::operator>(const M& r) const
-{
-    std::string s = to_string(r);
-    return std::strcmp(__value, s.data()) > 0;
-}
-
-template<typename M>
-bool String::operator==(const M& r) const
-{
-	std::string s = to_string(r);
-    return !std::strcmp(__value, s.data());
-}
-
-template<typename M>
-bool String::operator!=(const M& r) const
-{
+int String::compareTo(const M& r) const
+{	
 	std::string s = to_string(r);
     return std::strcmp(__value, s.data());
 }
 
 template<typename M>
+bool String::operator<(const M& r) const
+{
+	return compareTo(r) < 0;
+}
+
+template<typename M>
+bool String::operator>(const M& r) const
+{
+    return compareTo(r) > 0;
+}
+
+template<typename M>
+bool String::operator==(const M& r) const
+{
+	return !compareTo(r);
+}
+
+template<typename M>
+bool String::operator!=(const M& r) const
+{
+	return compareTo(r);
+}
+
+template<typename M>
 bool String::operator<=(const M& r) const
 {
-	std::string s = to_string(r);
-    return std::strcmp(__value, s.data()) <= 0;
+	return compareTo(r) <= 0;
 }
 
 template<typename M>
 bool String::operator>=(const M& r) const
-{
-	std::string s = to_string(r);
-    return std::strcmp(__value, s.data()) >= 0;
+{	
+	return compareTo(r) >= 0;
 }
 
 // end of file

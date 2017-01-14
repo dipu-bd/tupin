@@ -3,7 +3,7 @@ using namespace tupin;
 using namespace std;
 
 void testString()
-{ /*
+{ 
     const char* ca = "Hello";
     const char* cb = "World";
  
@@ -21,19 +21,24 @@ void testString()
     assert(!(a > b));
     assert(!(a >= b));
 
-    assert(a == "Hello");
-    assert(a <= "Hello");
-    assert("Hello" >= a);
-    assert("Hellos" != a);
-    assert("Hellos" < b);
+    printf("%s with %s = %d\n", "Hello", a.str(), a.compareTo("Hello"));
+
     assert(b > "Hellos");
+    assert("Hellos" < b);
+    assert(a == "Hello");    
+    assert("Hellos" != a);
+    assert(a <= "Hello");
  
-    assert(a == ca);
-    assert(a <= ca);
-    assert(ca >= a);
-    assert(ca != b);
     assert(ca < b);
     assert(b > ca); 
+    assert(a == ca);
+    assert(ca != b);
+    assert(a <= ca);
+
+    cerr << a << " " << ca << endl;
+    
+    assert("Hello" >= a);
+    assert(ca >= a);
     
     assert(strlen("Hello") == a.size());
     assert(strlen("World") == b.size());
@@ -50,7 +55,7 @@ void testString()
     {
         putchar(a[i]);
     }
-    puts(""); */
+    puts(""); 
 }
 
 void testBool()

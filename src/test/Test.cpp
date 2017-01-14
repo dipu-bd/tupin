@@ -44,6 +44,8 @@ int main(int argc, char **argv)
 {
     PFS all_tests[] = {
         {&testNumber, "testNumber"},
+        {&testBool, "testBool"},
+        {&testString, "testString"},
         {0, "null"},
     };
     runTests(FAILE_SAFE_MODE, all_tests);

@@ -26,6 +26,17 @@ void testString()
     assert(a == "Hello");
     assert("Hello" == a);
     
+    assert(strlen("Hello") == a.size());
+    assert(strlen("World") == b.size());
+    assert("Hello World" == a + " " + b);
+
+    assert(String("a") * 3 == "aaa");
+    assert(String("ab") * 2 == "abab");
+    assert(String("abc") * 1 == "abc");
+    assert(String("ab") * 5 == "ababababab");
+
+    puts(String("ab") * 10);
+
     for(int i = 0; i < a.size(); ++i)
     {
         putchar(a[i]);

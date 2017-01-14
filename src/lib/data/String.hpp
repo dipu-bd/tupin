@@ -5,89 +5,105 @@ namespace tupin
 class String : public Object<char *>
 {
   protected:
-    int __len;
+    size_t __len;
 
   public:
-    String(const char *v = "") : Object(new char[0]) { set(v); }
-    String(const String &v) : Object(v.__value) { __len = v.size(); }
-    String(const std::string &v = "") : Object(new char[0]) { set(v); }
+    ~String() 	{ delete __value; }
 
-    ~String() { delete __value; }
+	String() : Object(new char[0]) { set(""); } 
+	template<typename M> String(const M& v) : Object(new char[0]) {	set(v); } 
 
-    void set(const char *);
-    void set(const std::string &);
+    void 	clear();
+    size_t 	size() const;
+    char 	at(size_t) const;
+	String&	repeat(unsigned short);
 
-    void clear();
-    int size() const;
-    char at(int) const;
-    String &append(const char *);
-    String &repeat(unsigned short);
+    char&	operator[](size_t i);    	
+	String&	operator*=(unsigned short);
+    String 	operator*(unsigned short)const;		
+ 
+    template<typename M> void 		set(const M&);
 
-    char &operator[](int i);
-    String &operator=(const char *);
-    String &operator=(const std::string &);
-    String &operator+=(const char *);
-    String &operator*=(unsigned short);
-    String operator+(const char *) const;
-    String operator*(unsigned short)const;
-    bool operator<(const char *) const;
-    bool operator>(const char *) const;
-    bool operator==(const char *) const;
-    bool operator!=(const char *) const;
-    bool operator<=(const char *) const;
-    bool operator>=(const char *) const;
+    template<typename M> String&	append(const M&);    
+	template<typename M> String&	operator=(const M&);
+    template<typename M> String&	operator+=(const M&);	
+    template<typename M> String		operator+(const M&) const;
+
+    template<typename M> bool operator<(const M&) const;
+    template<typename M> bool operator>(const M&) const;
+    template<typename M> bool operator==(const M&) const;
+    template<typename M> bool operator!=(const M&) const;
+    template<typename M> bool operator<=(const M&) const;
+    template<typename M> bool operator>=(const M&) const;
+
+/*
+	// Input from stream
+    friend std::istream& operator<<(std::istream& is, String& str) {
+		std::string tmp;
+        is >> tmp; 
+		str = tmp;
+		return is;
+    } 
+*/
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T> std::string to_string(T value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
 
 void String::clear()
 {
     __len = 0;
     if (__value)
-	delete __value;
+		delete __value;
 }
 
-void String::set(const char *val)
+template<typename M>
+void String::set(const M& val)
 {
     clear();
     __value = new char[4];
-    std::strcat(__value, val);
-    __len = strlen(__value);
+	std::string s = to_string(val);	
+    std::strcat(__value, s.data());	
+	__len = s.size();
 }
 
-void String::set(const std::string &val)
-{
-    set(val.data());
-}
-
-int String::size() const
+size_t String::size() const
 {
     return __len;
 }
 
-char String::at(int i) const
+char String::at(size_t i) const
 {
     return (i >= 0 && i < __len) ? __value[i] : 0;
 }
 
-String &String::append(const char *r)
+template<typename M>
+String& String::append(const M& r)
 {
-    std::strcat(__value, r);
-    __len += strlen(r);
+	std::string s = to_string(r);
+    std::strcat(__value, s.data());
+    __len += s.size();
     return *this;
 }
 
-String &String::repeat(unsigned short n)
+String& String::repeat(unsigned short n)
 {
     char *tmp = new char[10]; // temporary value
     for (int i = sizeof(n) - 1; i >= 0; --i)
     {
-	std::strcat(tmp, tmp); // doubles previous
-	if (n & (1 << i))
-	{
-	    std::strcat(tmp, __value); // adds one
-	}
+		std::strcat(tmp, tmp); // doubles previous
+		if (n & (1 << i))
+		{
+			std::strcat(tmp, __value); // adds one
+		}
     }
+
     delete __value; // free old value
     __value = tmp;
     __len *= n;
@@ -96,7 +112,7 @@ String &String::repeat(unsigned short n)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-char &String::operator[](int i)
+char& String::operator[](size_t i)
 {
     if (i < 0 || i >= __len)
     {
@@ -105,32 +121,30 @@ char &String::operator[](int i)
 	return __value[i];
 }
 
-String &String::operator=(const char *r)
+template<typename M>	
+String& String::operator=(const M& r)
 {
-    set(r);
-    return *this;
-}
-String &String::operator=(const std::string &r)
-{
-    set(r.data());
+	set(r);
     return *this;
 }
 
-String &String::operator+=(const char *r)
+template<typename M>	
+String &String::operator+=(const M& r)
 {
     return append(r);
 }
-
+ 
 String &String::operator*=(unsigned short n)
 {
     return repeat(n);
 }
 
-String String::operator+(const char *r) const
+template<typename M>	
+String String::operator+(const M& r) const
 {
     return String(__value).append(r);
 }
-
+ 
 String String::operator*(unsigned short n) const
 {
     return String(__value).repeat(n);
@@ -138,29 +152,46 @@ String String::operator*(unsigned short n) const
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-bool String::operator<(const char *r) const
+template<typename M>
+bool String::operator<(const M& r) const
 {
-    return std::strcmp(__value, r) < 0;
+	std::string s = to_string(r);
+    return std::strcmp(__value, s.data()) < 0;
 }
-bool String::operator>(const char *r) const
+
+template<typename M>
+bool String::operator>(const M& r) const
 {
-    return std::strcmp(__value, r) > 0;
+    std::string s = to_string(r);
+    return std::strcmp(__value, s.data()) > 0;
 }
-bool String::operator==(const char *r) const
+
+template<typename M>
+bool String::operator==(const M& r) const
 {
-    return !std::strcmp(__value, r);
+	std::string s = to_string(r);
+    return !std::strcmp(__value, s.data());
 }
-bool String::operator!=(const char *r) const
+
+template<typename M>
+bool String::operator!=(const M& r) const
 {
-    return std::strcmp(__value, r);
+	std::string s = to_string(r);
+    return std::strcmp(__value, s.data());
 }
-bool String::operator<=(const char *r) const
+
+template<typename M>
+bool String::operator<=(const M& r) const
 {
-    return std::strcmp(__value, r) <= 0;
+	std::string s = to_string(r);
+    return std::strcmp(__value, s.data()) <= 0;
 }
-bool String::operator>=(const char *r) const
+
+template<typename M>
+bool String::operator>=(const M& r) const
 {
-    return std::strcmp(__value, r) >= 0;
+	std::string s = to_string(r);
+    return std::strcmp(__value, s.data()) >= 0;
 }
 
 // end of file

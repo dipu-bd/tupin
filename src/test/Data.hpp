@@ -3,7 +3,7 @@ using namespace tupin;
 using namespace std;
 
 void testString()
-{ 
+{ /*
     const char* ca = "Hello";
     const char* cb = "World";
  
@@ -50,7 +50,7 @@ void testString()
     {
         putchar(a[i]);
     }
-    puts("");
+    puts(""); */
 }
 
 void testBool()

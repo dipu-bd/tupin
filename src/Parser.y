@@ -1,33 +1,17 @@
-%{
-    #include <bits/stdc++.h> 
-    #include "lib/Token.hpp"
-
-    int yylex (void);
-    void init(int, char**);  
-    void yyerror(const char *);
+%{ 
+    #include "lib/ParserHelper.hpp"
 %}
  
-/*%locations*/
-
 %token OP PWR PWREQ
 %token STRING INT FLOAT ID 
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
 
 %%
 
-program: ; /* empty statement */
-
+program: program statement ';' 
+       | program block ';' 
+       | program 
 %% 
-
-void yyerror(const char *msg, int line, int col, const char* file = "")
-{
-    fprintf(stderr, "%4s:%d:%d: %s\n", file, line, col, msg);
-}
-
-void yyerror(const char *msg)
-{
-    yyerror(msg, -1, -1);
-}
 
 int main(int argc, char *argv[])
 {

@@ -54,13 +54,13 @@ BADESC          \\([^0-9]|{DIGIT}+)
 {SPACE}		        /* skip whitespace */
 
     /*********** Comments **********/
-"//"[^\n]*          /* eat up single line comment */
 <INITIAL>"/*"       { BEGIN(comment); }
 <comment>{
     [^*\n]*         /* eat anything that's not a '*' */
     "*"+[^*/\n]*    /* eat up '*'s not followed by '/'s  */ 
     "*/"            { BEGIN(INITIAL); }
 }
+"//"[^\n]*          /* eat up single line comment */
 
     /*********** Strings **********/ 
 <INITIAL>"\'"       { BEGIN(sqstr); token.val = yytext; }

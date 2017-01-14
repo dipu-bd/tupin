@@ -75,6 +75,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
                       BEGIN(INITIAL); __RETURN(STRING);  }
 
     /*********** Operators **********/
+"..."               { __RETURN(THREEDOT); }
 "**="               { __RETURN(PWREQ); }
 {OP_EQ}|{OP_DBL}    { token.val = yytext; __RETURN(OP); }
 "**"                { __RETURN(PWR); }

@@ -2,15 +2,48 @@
     #include "lib/ParserHelper.hpp"
 %}
  
-%token OP PWR PWREQ
+%token OP PWR PWREQ THREEDOT
 %token STRING INT FLOAT ID 
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
 
 %%
+Program: Program Block 
+    | Program Function
+    |
+    ;
 
-program: program statement ';' 
-       | program block ';' 
-       | program 
+Block : Loop
+    | Condition
+    | Statement 
+    ;
+
+Function: DEF ID '(' Arguments ')' '{' block '}'
+    ;    
+
+Arguments:  /* can be empty */
+    | ArgVarList 
+    | ArgAsnList
+    | ArgVarList ',' ArgAsnList
+    ;
+
+ArgVarList: Variable
+    | ArgVarList ',' Variable
+    ;
+
+ArgAsnList: Variable '=' Literal
+    | ArgAsnList ',' Variable '=' Literal
+    ;
+
+Variable: ID
+    ;
+
+Literal: INT
+    | FLOAT
+    | STRING 
+    | Array
+    ;
+
+
 %% 
 
 int main(int argc, char *argv[])

@@ -7,6 +7,11 @@
 %token STRING INT FLOAT ID 
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
  
+%union 
+{
+    Token* token;
+}
+
 %%
     /*---------------------------------_ 
      |            Start Point           |
@@ -45,13 +50,6 @@ Statement: SingleStmnt ';'
 SingleStmnt: Declaration
     | PrintStmnt
     | Expression
-    ;
-
-    /*---------------------------------_ 
-     |      Variable  Declarations      |
-     *----------------------------------*/    
-
-Declaration: ID '=' Expression
     ;
 
     /*---------------------------------_ 
@@ -117,8 +115,12 @@ Params: Expression
     ;
 
     /*---------------------------------_ 
-     |        Array Definition          |
+     |       Variable  and Array        |
      *----------------------------------*/    
+
+Declaration: ID '=' Expression
+    | ID '=' Array
+    ; 
 
 Array: '{' ParamList '}'
     ;
@@ -129,6 +131,7 @@ Array: '{' ParamList '}'
 Expression: Literal
     | Number
     | ID 
+    | FunctionCall
     ;
     
 Literal: Number

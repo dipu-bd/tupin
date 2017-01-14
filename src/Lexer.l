@@ -1,12 +1,11 @@
-%{      
-    #include <bits/stdc++.h> 
+%{       
     #include "commons.hpp"
     #include "Parser.hpp"
     #include "LexerHelper.hpp"
 
     #define YY_USER_ACTION token.update(yylineno, yyleng);
     #define __RETURN(x) return retToken(x,#x)
-    #define __ERROR(x)  yyerror(x, getLine(), getColumn(), getFile())
+    #define __ERROR(x)  yyerror(x, token.line, token.column, token.file.data())
 %}
 
 %option warn

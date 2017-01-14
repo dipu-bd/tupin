@@ -39,15 +39,15 @@ function compile
     echo "Generating yacc artifacts..."  
     bison "$BUILD_PATH/Parser.y" -do $YACCPP
 
-    if [ -f "$BUILD_PATH/Lexer.cpp" ]; then
-        if [ -f "$BUILD_PATH/Parser.cpp" ]; then
-            echo "Compiling C++ file..."
-            g++ -std=gnu++11 -o $PROGRAM_FILE $LEXCPP $YACCPP
-        else 
-            echo "~ERROR: Parser.cpp not found.";
+    if [ -f $YACCPP ]; then
+        if [ -f $LEXCPP ]; then
+                echo "Compiling C++ file..."
+                g++ -std=gnu++11 -o $PROGRAM_FILE $LEXCPP $YACCPP
+        else
+            echo "~ERROR: $LEXCPP not found.";
         fi
-    else
-        echo "~ERROR: Lexer.cpp not found.";
+    else 
+        echo "~ERROR: $YACCPP not found.";
     fi
     
     echo "------------------- DONE ------------------------"

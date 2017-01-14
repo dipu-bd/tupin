@@ -1,22 +1,17 @@
 %{     
-    #include "lib/Util.h"
-    #include "Parser.h"
+    #define YYSTYPE Token
+    
+    #include "lib/LexHelper.hpp"
+    #include "Parser.hpp"
 
-    void yyerror(const char *msg);
-
-    offset_t offset;
-    extern YYLTYPE yylloc;
-
-    #define YY_USER_ACTION \
-        offset += yyleng; \
-        yylloc->last_line = yylineno; \
-        yylloc->last_column = offset;
+    #define YY_USER_ACTION token.update(yylineno, yyleng);
+    #define __RETURN(x) return retToken(x,#x)
+    #define __ERROR(x)  yyerror(x, getLine(), getColumn(), getFile())
 %}
 
 %option warn
 %option noyywrap
 %option yylineno
-%option bison-locations 
 
 %x comment
 %x sqstr dqstr
@@ -51,8 +46,8 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    /*********** Declarations **********/ 
-    offset = 0; 
+    /*********** Initialization **********/       
+    token.update(0, 0);
     //printf("%3d. ", yylineno);
     
     /*********** Whitespaces **********/
@@ -68,36 +63,36 @@ BADESC          \\([^0-9]|{DIGIT}+)
 }
 
     /*********** Strings **********/ 
-<INITIAL>"\'"       { BEGIN(sqstr); yylval = yytext; }
-<INITIAL>"\""       { BEGIN(dqstr); yylval = yytext; }
+<INITIAL>"\'"       { BEGIN(sqstr); token.val = yytext; }
+<INITIAL>"\""       { BEGIN(dqstr); token.val = yytext; }
 <sqstr,dqstr>{
-    {ESCAPE}        { yylval += yytext; }
-    {BADESC}        { yylval += (yytext + 1);
-                      yyerror("Unrecognized escape sequence"); }    
+    {ESCAPE}        { token.val += yytext; }
+    {BADESC}        { token.val += (yytext + 1);
+                      __ERROR("Unrecognized escape sequence"); }    
 }
-<dqstr>[^\\"]*\"    { BEGIN(INITIAL); yylval += yytext; __RETURN_VAL(STRING); } 
-<sqstr>[^\\']*\'    { yylval += yytext; yylval[0] = yylval[yyleng-1] = '"';  
-                      BEGIN(INITIAL); __RETURN_VAL(STRING);  }
+<dqstr>[^\\"]*\"    { BEGIN(INITIAL); token.val += yytext; __RETURN(STRING); } 
+<sqstr>[^\\']*\'    { token.val += yytext; token.val[0] = token.val[yyleng-1] = '"';  
+                      BEGIN(INITIAL); __RETURN(STRING);  }
 
     /*********** Operators **********/
 "**="               { __RETURN(PWREQ); }
-{OP_EQ}|{OP_DBL}    { yylval = yytext; __RETURN_VAL(OP); }
+{OP_EQ}|{OP_DBL}    { token.val = yytext; __RETURN(OP); }
 "**"                { __RETURN(PWR); }
-"<>"                { yylval = "!="; __RETURN_VAL(OP); }
+"<>"                { token.val = "!="; __RETURN(OP); }
 {OP_SNGL}           { __RETURN(yytext[0]); }
 
 
     /*********** Numbers **********/    
-{BIN}               { yylval = toNumber(yytext + 2, 2); __RETURN_VAL(INT); }
-{OCTA}              { yylval = toNumber(yytext + 2, 8); __RETURN_VAL(INT); }      
-{HEXA}              { yylval = toNumber(yytext + 2, 16); __RETURN_VAL(INT); }   
-{EFLOAT}            { yylval = toNumber(yytext, 0); __RETURN_VAL(FLOAT); }       
-{FLOAT}             { yylval = toNumber(yytext, 0); __RETURN_VAL(FLOAT); }      
-{INT}               { yylval = toNumber(yytext, 10); __RETURN_VAL(INT);  } 
-{INVALID_NUMBER}    { yyerror("Invalid number"); }
+{BIN}               { token.val = toNumber(yytext + 2, 2); __RETURN(INT); }
+{OCTA}              { token.val = toNumber(yytext + 2, 8); __RETURN(INT); }      
+{HEXA}              { token.val = toNumber(yytext + 2, 16); __RETURN(INT); }   
+{EFLOAT}            { token.val = toNumber(yytext, 0); __RETURN(FLOAT); }       
+{FLOAT}             { token.val = toNumber(yytext, 0); __RETURN(FLOAT); }      
+{INT}               { token.val = toNumber(yytext, 10); __RETURN(INT);  } 
+{INVALID_NUMBER}    { __ERROR("Invalid number"); }
 
     /*********** Keywords **********/
-"true"|"false"      { yylval = toNumber(yytext + 2, 2); __RETURN_VAL(INT); }
+"true"|"false"      { token.val = toNumber(yytext + 2, 2); __RETURN(INT); }
 "def"               { __RETURN(DEF); }
 "return"            { __RETURN(RETURN); }
 "if"                { __RETURN(IF); }
@@ -114,15 +109,9 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "by"                { __RETURN(BY); } 
 
     /*********** Identifier **********/
-{IDENTIFIER}        { yylval = yytext; __RETURN_VAL(ID); }
+{IDENTIFIER}        { token.val = yytext; __RETURN(ID); }
 
-.                   { yyerror("Unrecognized Character"); }
-<*>\n               { offset = 0; } //printf("\n%3d. ", yylineno); 
+.                   { __ERROR("Unrecognized Character"); }
+<*>\n              { token.clear(); } /* printf("\n%3d. ", yylineno); */
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
-
-
-
-
-

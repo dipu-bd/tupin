@@ -33,7 +33,7 @@ struct Token
     Token copy()
     {
         Token tok;
-        tok.val = vald.data();
+        tok.val = val.data();
         tok.type = type;
         tok.line = line;
         tok.column = column;

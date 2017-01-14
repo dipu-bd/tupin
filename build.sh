@@ -8,6 +8,8 @@ SOURCE_PATH="src"
 LIB_PATH="$SOURCE_PATH/lib"
 TEST_PATH="$SOURCE_PATH/test"
 PROGRAM_FILE="$BUILD_PATH/Program.exe"
+INPUT_FILE=""
+OUTPUT_FILE=""
 
 #################################################
 
@@ -30,10 +32,18 @@ function compile
     flex -o"$BUILD_PATH/Lexer.cpp" "$SOURCE_PATH/Lexer.l"
 
     echo "Generating yacc artifacts..."
-    bison -do "$BUILD_PATH/Parser.cpp" "$BUILD_PATH/Parser.hpp"
+    bison "$SOURCE_PATH/Parser.y" --defines="$BUILD_PATH/Parser.h" --output="$BUILD_PATH/Parser.cpp"  
 
-    echo "Compiling C++ file..."
-    g++ -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" "$BUILD_PATH/Parser.cpp" 
+    if [ -f "$BUILD_PATH/Lexer.cpp" ]; then
+        if [ -f "$BUILD_PATH/Parser.cpp" ]; then
+            echo "Compiling C++ file..."
+            g++ -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" "$BUILD_PATH/Parser.cpp" 
+        else 
+            echo "~ERROR: Parser.cpp not found.";
+        fi
+    else
+        echo "~ERROR: Lexer.cpp not found.";
+    fi
 
     echo "---------------- DONE ------------------"
 }
@@ -45,7 +55,7 @@ function run
     echo "Starting program..."
     echo "----------------------------------------"
     if [ -f "./$PROGRAM_FILE" ]; then
-        "./$PROGRAM_FILE"
+        "./$PROGRAM_FILE $INPUT_FILE $OUTPUT_FILE"
     else 
         echo "No program file."
         exit 1
@@ -62,7 +72,7 @@ function test
     echo "Running tests..."
     echo "----------------------------------------"
     if [ -f "$BUILD_PATH/Test.exe" ]; then
-        "./$BUILD_PATH/Test.exe"
+        "./$BUILD_PATH/Test.exe $INPUT_FILE $OUTPUT_FILE"
     else 
         echo "No program file."
         exit 1
@@ -76,14 +86,14 @@ function help
     echo "  -h | help     Shows this message."
     echo "  -r | run      Opens the program after compiling."
     echo "  -t | test     Runs tests after compiling."
+    echo "  -i            Input file"
+    echo "  -o            Output file"
 }
 
 #################################################
     
-if [ "$1" == "" ]; then
-    compile
-    exit
-fi
+RUN_TASK=0
+TEST_TASK=0
 
 while [ "$1" != "" ]; do
     case $1 in         
@@ -93,14 +103,27 @@ while [ "$1" != "" ]; do
         -c | compile )          compile
                                 exit
                                 ;;
-        -t | test )             test
-                                exit
+        -t | test )             test 
                                 ;;                                
-        -r | run )              run
-                                exit
+        -r | run )              run 
+                                ;;
+        -i  )                   shift
+                                INPUT_FILE=$1
+                                ;;
+        -o  )                   shift
+                                OUTPUT_FILE=$1
                                 ;;
         * )                     help
-                                exit 1
+                                exit 1 
     esac
     shift
 done
+
+# RUN TASKS AT LAST
+compile
+if [ RUN_TASK == 1 ]; then
+    run
+else if [ TEST_TASK == 1 ]; then
+    test
+fi
+exit

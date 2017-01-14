@@ -1,4 +1,3 @@
-
 auto begin = std::chrono::high_resolution_clock::now();
 
 struct Environment

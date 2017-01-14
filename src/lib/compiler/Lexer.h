@@ -1,14 +1,3 @@
-
-#ifdef DEBUG
-int RETURN(int id, const char* text) 
-{ 
-    return id;
-}
-#endif
-#ifndef DEBUG
-
-#endif
-
 void checkNumber(const char *s, int base = 10)
 {
     if (base >= 2)

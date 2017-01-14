@@ -1,7 +1,8 @@
 %{    
-    #include "Parser.hpp"
-    #include "lib/compiler/Lexer.hpp"
-    #include "lib/compiler/StringBuilder.hpp"
+    #include <bits/stdc++.h>
+    #include "Parser.h"
+    #include "lib/compiler/Lexer.h"
+    #include "lib/compiler/StringBuilder.h"
 
     offset_t offset;
     extern YYLTYPE yylloc;
@@ -18,7 +19,8 @@
 %option bison-locations 
 
 %x comment
-%x sqstr dqstr
+%x sqstr
+%x dqstr
 
     /* Whitespace */
 SPACE           [ \t\r\v\f]
@@ -89,7 +91,6 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 {SPACE}		        /* skip whitespace */
 
     /*********** Operators **********/
-    // EQ NE LE GE OR AND SHL SHR INC DEC PE ME CE DE MDE PWR SHLE SHRE PWRE RAND OE XE AE 
 "=="                { RETURN(EQ); }
 "!="|"<>"           { RETURN(NE); }
 "<="                { RETURN(LE); }
@@ -135,21 +136,6 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 <*>\n               { offset = 0; } //printf("\n%3d. ", yylineno); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-int main(int argc, char** argv) 
-{ 
-    /* Open input and output files for testing */
-    env = Environment(argc, argv);  
-    yyin = env.openInput();
-    yyout = env.openOutput();
-    if(yyout) stdout = yyout;
-    
-    /* start lexer */
-    yylex();
-
-    env.showTime();
-    return 0;
-} 
 
 
 

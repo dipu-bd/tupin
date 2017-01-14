@@ -1,4 +1,5 @@
-#include "lib/compiler/Environment.hpp"
+#include <bits/stdc++.h>
+#include "lib/compiler/Environment.h"
 
 #ifdef DEBUG
     int dbgToken(int tok, const char *s)
@@ -17,3 +18,14 @@
     #define RETURN(x) return (x)
     #define RETURN_value(x) return (x)
 #endif
+    
+Environment env;    
+
+void yyerror(const char *msg)
+{
+    fprintf(stderr, "%s:%d:%d: %s\n", 
+        env.input(),
+        yylloc.last_line,
+        yylloc.last_column,
+        msg);
+}

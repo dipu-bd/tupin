@@ -1,7 +1,6 @@
 %{
     #include <bits/stdc++.h>
-    #include "lib/compiler/Parser.hpp"    
-    Environment env;    
+    #include "lib/compiler/Parser.hpp"
 %}
 
 %define api.pure
@@ -15,9 +14,11 @@
 %token DOT
 %token STRING
 
+
+    /* EQ NE LE GE OR AND SHL SHR INC DEC PE ME CE DE MDE PWR SHLE SHRE PWRE RAND OE XE AE */
 %right '='
 %left AND OR
-%left '<' '>' LE GE EQ NE LT GT
+%left '<' '>' LE GE EQ NE
 %%
 
 program: program '\n' { printf("ONE LINER\n"); }
@@ -25,15 +26,6 @@ program: program '\n' { printf("ONE LINER\n"); }
     ;
 
 %% 
-
-void yyerror(const char *msg)
-{
-    fprintf(stderr, "%s:%d:%d: %s\n", 
-        env.input(),
-        yylloc.last_line,
-        yylloc.last_column,
-        msg);
-}
 
 int main(int argc, char *argv[])
 {

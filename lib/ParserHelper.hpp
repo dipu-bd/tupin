@@ -1,22 +1,13 @@
 using namespace std;
 
-union LVal 
+void yyerror(const char *msg)
 {
-    Token token;
-};
-
-int yylex (void);
-int yyparse(void);
-void init(int, char**);  
+    yyerror(msg, -1, -1);
+}
 
 void yyerror(const char *msg, int line, int col, const char* file = "")
 {
     fprintf(stderr, "%4s:%d:%d: %s\n", file, line, col, msg);
-}
-
-void yyerror(const char *msg)
-{
-    yyerror(msg, -1, -1);
 }
 
 int MainFunction(int argc, char** argv)

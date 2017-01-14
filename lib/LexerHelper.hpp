@@ -1,26 +1,7 @@
 using namespace std;
 
-#define YYSTYPE LVal
-
-void yyerror(const char *msg);
-void yyerror(const char *msg, int line, int col, const char* file = "");
-
 /* Creating instance of Token */
 Token token;
-
-/* Token service */
-int getLine()
-{
-    return token.line;
-}
-int getColumn()
-{
-    return token.column;
-}
-const char* getFile()
-{
-    return token.file.data();
-}
 
 /* Function definitions for lexer*/
 std::string toNumber(const char *s, int base = 10)
@@ -55,7 +36,7 @@ int retToken(int tok, const char *s)
         s, token.val.data());
     #endif
     return tok;
-}
+} 
 
 /* Function definitions for parser*/
 void init(int argc, char** argv)

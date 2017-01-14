@@ -1,6 +1,6 @@
-%{
-    #include <bits/stdc++.h> 
-    #include "lib/ParserHelper.hpp"    
+%{ 
+    #include "commons.hpp"    
+    #include "ParserHelper.hpp"    
 %}
  
 %token OP PWR PWREQ THREEDOT

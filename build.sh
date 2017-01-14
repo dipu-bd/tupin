@@ -8,6 +8,7 @@ SOURCE_PATH="src"
 LIB_PATH="$SOURCE_PATH/lib"
 TEST_PATH="$SOURCE_PATH/test"
 PROGRAM_FILE="$BUILD_PATH/Program.exe"
+PARAMS=""
 INPUT_FILE=""
 OUTPUT_FILE=""
 
@@ -31,8 +32,8 @@ function compile
     echo "Generating lex artifacts..."
     flex -o"$BUILD_PATH/Lexer.cpp" "$SOURCE_PATH/Lexer.l"
 
-    echo "Generating yacc artifacts..."
-    bison "$SOURCE_PATH/Parser.y" --defines="$BUILD_PATH/Parser.h" --output="$BUILD_PATH/Parser.cpp"  
+    echo "Generating yacc artifacts..."  
+    bison "$SOURCE_PATH/Parser.y" -do "$BUILD_PATH/Parser.cpp"  
 
     if [ -f "$BUILD_PATH/Lexer.cpp" ]; then
         if [ -f "$BUILD_PATH/Parser.cpp" ]; then
@@ -44,45 +45,57 @@ function compile
     else
         echo "~ERROR: Lexer.cpp not found.";
     fi
+    
+    echo "------------------- DONE ------------------------"
+}
 
-    echo "---------------- DONE ------------------"
+function attachParam
+{
+    # attach input and output to params
+    if [ -f "$INPUT_FILE" ]; then
+        PARAMS="$PARAMS $INPUT_FILE"
+    fi 
+    if [ -f "$OUTPUT_FILE" ]; then
+        PARAMS="$PARAMS $OUTPUT_FILE"
+    fi
 }
 
 function run
 {   
-    compile
-
-    echo "Starting program..."
-    echo "----------------------------------------"
-    if [ -f "./$PROGRAM_FILE" ]; then
-        "./$PROGRAM_FILE $INPUT_FILE $OUTPUT_FILE"
-    else 
+    PARAMS="./$PROGRAM_FILE"    
+    if [ ! -f $PARAMS ]; then
         echo "No program file."
         exit 1
     fi  
+
+    echo "Starting program..."
+    echo "$PARAMS"
+    echo "-------------------------------------------------"    
+    attachParam
+    $PARAMS
 }
 
 function test 
-{
-    compile
-
+{ 
     echo "Compiling tests..."
     g++ -rdynamic -std=gnu++11 -o "$BUILD_PATH/Test.exe" "$TEST_PATH/Test.cpp"
 
-    echo "Running tests..."
-    echo "----------------------------------------"
-    if [ -f "$BUILD_PATH/Test.exe" ]; then
-        "./$BUILD_PATH/Test.exe $INPUT_FILE $OUTPUT_FILE"
-    else 
+    PARAMS="$BUILD_PATH/Test.exe"
+    if [! -f  $PARAMS ]; then
         echo "No program file."
         exit 1
     fi 
+
+    echo "Running tests..."
+    echo "$PARAMS"
+    echo "-------------------------------------------------"    
+    attachParam
+    $PARAMS
 }
 
 function help
 {
     echo "Tupin builder options:"
-    echo "  -c | compile  Just compile."
     echo "  -h | help     Shows this message."
     echo "  -r | run      Opens the program after compiling."
     echo "  -t | test     Runs tests after compiling."
@@ -97,21 +110,18 @@ TEST_TASK=0
 
 while [ "$1" != "" ]; do
     case $1 in         
-        -h | --help | help )    help
-                                exit
-                                ;;
-        -c | compile )          compile
-                                exit
-                                ;;
-        -t | test )             test 
+        -t | test )             TEST_TASK=1 
                                 ;;                                
-        -r | run )              run 
+        -r | run )              RUN_TASK=1 
                                 ;;
-        -i  )                   shift
+        -i )                    shift
                                 INPUT_FILE=$1
                                 ;;
-        -o  )                   shift
+        -o )                    shift
                                 OUTPUT_FILE=$1
+                                ;;
+        -h | --help | help )    help
+                                exit
                                 ;;
         * )                     help
                                 exit 1 
@@ -121,9 +131,8 @@ done
 
 # RUN TASKS AT LAST
 compile
-if [ RUN_TASK == 1 ]; then
+if [ $RUN_TASK == 1 ]; then 
     run
-else if [ TEST_TASK == 1 ]; then
+elif [ $TEST_TASK == 1 ]; then 
     test
-fi
-exit
+fi 

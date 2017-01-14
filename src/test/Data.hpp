@@ -11,9 +11,9 @@ void testString()
     String b = cb;
     String c("News");
 
-    a = ca;
+    a = ca;    
     b = cb;
-
+    
     assert(a != b);
     assert(a < b);
     assert(a <= b);
@@ -26,6 +26,11 @@ void testString()
     assert(a == "Hello");
     assert("Hello" == a);
     
+    for(int i = 0; i < a.size(); ++i)
+    {
+        putchar(a[i]);
+    }
+    puts("");
 }
 
 void testBool()

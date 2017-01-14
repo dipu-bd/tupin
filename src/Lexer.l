@@ -1,13 +1,20 @@
 %{    
-    #include <bits/stdc++.h>
     #include "Parser.hpp"
     #include "lib/Lexer.hpp"
-    #define YY_USER_ACTION { loc.col += (int)yyleng; loc.line = yylineno; }
+
+    offset_t offset;
+    extern YYLTYPE yylloc;
+
+    #define YY_USER_ACTION \
+        offset += yyleng; \
+        yylloc.last_line = yylineno; \
+        yylloc.last_column = offset;
 %}
 
 %option warn
 %option noyywrap
 %option yylineno
+%option bison-locations 
 
 %x comment
 %x sqstr dqstr
@@ -42,8 +49,9 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     /*********** Declarations **********/ 
+    offset = 0;
     StringBuilder __builder;
-    printf("%3d. ", yylineno);
+    //printf("%3d. ", yylineno);
     
     /*********** Comments **********/
 "//"[^\n]*          /* eat up single line comment */
@@ -79,8 +87,32 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
     /*********** Whitespaces **********/
 {SPACE}		        /* skip whitespace */
 
-    /*********** Operator **********/
-{OPERATOR}          { checkOperator(yytext); }
+    /*********** Operators **********/
+    // EQ NE LE GE OR AND SHL SHR INC DEC PE ME CE DE MDE PWR SHLE SHRE PWRE RAND OE XE AE 
+"=="                { RETURN(EQ); }
+"!="|"<>"           { RETURN(NE); }
+"<="                { RETURN(LE); }
+">="                { RETURN(GE); }
+"||"                { RETURN(OR); }
+"&&"                { RETURN(AND); }
+">>"                { RETURN(SHL); }
+"<<"                { RETURN(SHR); }
+"++"                { RETURN(INC); }
+"--"                { RETURN(DEC); }
+"+="                { RETURN(PE); }
+"-="                { RETURN(ME); }
+"*="                { RETURN(CE); }
+"/="                { RETURN(DE); }
+"%="                { RETURN(MDE); 
+"**"                { RETURN(PWR); }}
+">>="               { RETURN(SHLE); }
+"<<="               { RETURN(SHRE); } 
+"**="               { RETURN(PWRE); }
+"#"                 { RETURN(RAND); }
+"|="                { RETURN(OE); }
+"^="                { RETURN(XE); }
+"&="                { RETURN(AE); }
+{OPERATOR}          { RETURN(yytext[0]); }
 
     /*********** Numbers **********/    
 {BIN}               { checkNumber(yytext + 2, 2); }
@@ -99,7 +131,7 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 {IDENTIFIER}        { checkIdentifier(yytext); }
 
 .                   { yyerror("Unrecognized Character"); }
-<*>\n               { loc.col = 0; printf("\n%3d. ", yylineno); }
+<*>\n               { offset = 0; } //printf("\n%3d. ", yylineno); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

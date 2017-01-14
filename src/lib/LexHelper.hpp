@@ -49,7 +49,7 @@ std::string toNumber(const char *s, int base = 10)
 /* Debuggin and token returns */
 int retToken(int tok, const char *s)
 {
-    yylval = token.copy();
+    yylval.token = token;
     #ifdef DEBUG
     printf("%s:%d:%d: %s\n", 
         token.file.data(),

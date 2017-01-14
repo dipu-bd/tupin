@@ -1,10 +1,14 @@
-#include <bits/stdc++.h>
-#include "Token.hpp"
 using namespace std;
 
+union LVal 
+{
+    Token token;
+};
+
 int yylex (void);
+int yyparse(void);
 void init(int, char**);  
-    
+
 void yyerror(const char *msg, int line, int col, const char* file = "")
 {
     fprintf(stderr, "%4s:%d:%d: %s\n", file, line, col, msg);

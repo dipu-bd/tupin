@@ -1,8 +1,8 @@
-%{     
-    #define YYSTYPE Token
-    
-    #include "lib/LexHelper.hpp"
+%{      
+    #include <bits/stdc++.h> 
+    #include "lib/Token.hpp"
     #include "Parser.hpp"
+    #include "lib/LexHelper.hpp"
 
     #define YY_USER_ACTION token.update(yylineno, yyleng);
     #define __RETURN(x) return retToken(x,#x)

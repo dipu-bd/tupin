@@ -1,11 +1,9 @@
-#include <bits/stdc++.h> 
-#include "Token.hpp"
 using namespace std;
-     
+
+#define YYSTYPE LVal
+
 void yyerror(const char *msg);
 void yyerror(const char *msg, int line, int col, const char* file = "");
-
-extern YYSTYPE yylval;
 
 /* Creating instance of Token */
 Token token;
@@ -48,7 +46,7 @@ std::string toNumber(const char *s, int base = 10)
 
 /* Debuggin and token returns */
 int retToken(int tok, const char *s)
-{
+{ 
     yylval.token = token;
     #ifdef DEBUG
     printf("%s:%d:%d: %s\n", 

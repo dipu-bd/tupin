@@ -1,31 +1,26 @@
-%{ 
-    #include "lib/ParserHelper.hpp"
+%{
+    #include <bits/stdc++.h> 
+    #include "lib/ParserHelper.hpp"    
 %}
-
  
 %token OP PWR PWREQ THREEDOT
 %token STRING INT FLOAT ID 
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
-
-%union
-{
-    Token token
-}
-
+ 
 %%
     /*---------------------------------_ 
-    |            Start Point            |
+     |            Start Point           |
      *----------------------------------*/    
 Program: Program Block 
     | Program Function
-    |
+    |   /* NULL */
     ;
 
     /*---------------------------------_ 
-    |       Functoin Definition         |
+     |       Functoin Definition        |
      *----------------------------------*/    
 Function: DEF ID '(' Arguments ')' '{' Block '}'
-    ;    
+    ; 
 
 Arguments:  /* can be empty */
     | ArgVarList 
@@ -36,7 +31,7 @@ ArgVarList: ID
     ; 
     
     /*---------------------------------_ 
-    |        Block's Definition         |
+     |        Block's Definition        |
      *----------------------------------*/     
 Block : Loop
     | Condition
@@ -53,35 +48,36 @@ SingleStmnt: Declaration
     ;
 
     /*---------------------------------_ 
-    |      Variable  Declarations       |
+     |      Variable  Declarations      |
      *----------------------------------*/    
 
 Declaration: ID '=' Expression
     ;
 
     /*---------------------------------_ 
-    |         Print Statement           |
+     |         Print Statement          |
      *----------------------------------*/    
 PrintStmnt: '[' PrintSequence ']'
     ;
 
-PrintSequence: /* can be empty */
+PrintSequence: 
+      PrintSequence STRING
+    | PrintSequence Expression
     | STRING
     | Expression
-    | PrintSequence STRING
-    | PrintSequence Expression
+    |   /* can be empty */
     ;
 
     /*---------------------------------_ 
-    |             Conditions            |
+     |            Conditions            |
      *----------------------------------*/         
 Condition: IF '(' Expression ')' Block Branch
     | IF '[' ID ']' '{' Switch '}' 
     ;
 
-Branch: /* can be empty */
+Branch: ELIF '(' Expression ')' Block Branch
     | ELSE Block
-    | ELIF '(' Expression ')' Block Branch
+    | /* can be empty */
     ;
 
 Switch: Choice
@@ -92,12 +88,12 @@ Choice: Literal ':' '{' Block '}'
     ;
 
     /*---------------------------------_ 
-    |               Looping             |
+     |              Looping             |
      *----------------------------------*/    
 Loop: FOR '(' Expression ')' '{' Block '}'
     | FOR '(' Declaration ';' Expression ';' Expression ')' '{' Block '}'
     | FOR '[' LoopIterator ']' '{' Block '}'
-    | FOR '[' ID LoopIterator ']' '{' Block '}'
+    | FOR '[' ID ':' LoopIterator ']' '{' Block '}'
     ;
 
 LoopIterator: 
@@ -107,13 +103,13 @@ LoopIterator:
     ;
 
     /*---------------------------------_ 
-    |         Function Call             |
+     |         Function Call            |
      *----------------------------------*/    
 FunctionCall: ID '(' ParamList ')'
     ;
 
-ParamList: /* can be empty */
-    | Params
+ParamList: Params 
+    |    /* can be empty */
     ;
 
 Params: Expression
@@ -121,19 +117,18 @@ Params: Expression
     ;
 
     /*---------------------------------_ 
-    |        Array Definition           |
+     |        Array Definition          |
      *----------------------------------*/    
 
 Array: '{' ParamList '}'
     ;
 
     /*---------------------------------_ 
-    |            Expression             |
+     |            Expression            |
      *----------------------------------*/    
 Expression: Literal
     | Number
     | ID 
-    | 
     ;
     
 Literal: Number

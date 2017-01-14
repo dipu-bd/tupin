@@ -8,16 +8,29 @@ SOURCE_PATH="src"
 LIB_PATH="lib"
 TEST_PATH="test"
 
+ARTIFACT_FILE="lib/artifacts.h"
+ARTIFACT_FOLDER="lib/artifact"
+
 PARAMS=""
 INPUT_FILE=""
 OUTPUT_FILE=""
 
+
 PROGRAM_FILE="$BUILD_PATH/Program.exe"
 
 #################################################
-
-noecho
  
+function help
+{
+    echo "Tupin builder options:"
+    echo "  -h | help     Shows this message."
+    echo "  -r | run      Opens the program after compiling."
+    echo "  -t | test     Runs tests after compiling."
+    echo "  -i            Input file"
+    echo "  -o            Output file"
+    echo "  artifacts     Build artifacts.h file"
+}
+
 function compile
 {
     if [ -d "$BUILD_PATH" ]; then
@@ -100,14 +113,37 @@ function test
     $PARAMS
 }
 
-function help
+function artifacts
 {
-    echo "Tupin builder options:"
-    echo "  -h | help     Shows this message."
-    echo "  -r | run      Opens the program after compiling."
-    echo "  -t | test     Runs tests after compiling."
-    echo "  -i            Input file"
-    echo "  -o            Output file"
+    cd $ARTIFACT_FOLDER
+
+    # Top level files
+    pad=0
+    for file in *.h ; do 
+        if [ -f $file ]; then            
+            echo "#include \"$file\""    
+            pad=1    
+        fi
+    done    
+    if [ $pad == 1 ]; then
+        echo 
+    fi
+
+    # Other files recursively 
+    for dir in ** ; do 
+        pad=0
+        for file in "$dir"/*.h; do
+            if [ -f $file ]; then
+                echo "#include \"$file\""        
+                pad=1
+            fi
+        done
+        if [ $pad == 1 ]; then
+            echo
+        fi
+    done
+
+    echo
 }
 
 #################################################
@@ -128,6 +164,11 @@ while [ "$1" != "" ]; do
                                 OUTPUT_FILE=$1
                                 ;;
         -h | --help | help )    help
+                                exit
+                                ;;
+        artifacts )             echo "Gathering artifacts files..."
+                                artifacts > "$ARTIFACT_FILE"
+                                echo "$ARTIFACT_FILE updated."
                                 exit
                                 ;;
         * )                     help

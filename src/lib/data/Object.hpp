@@ -15,7 +15,7 @@ class Object
     operator std::string() const;
 
     const T &get() const;
-    Object<T> &set(const T &);
+    void set(const T &);
 
     int compareTo(const Object<T> &) const;
 };
@@ -37,10 +37,9 @@ const T &Object<T>::get() const
 }
 
 template <typename T>
-Object<T> &Object<T>::set(const T &v)
+void Object<T>::set(const T &v)
 {
-    __value = v;
-    return *this;
+    __value = v; 
 }
 
 template <typename T>

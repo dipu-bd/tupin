@@ -3,8 +3,29 @@ using namespace tupin;
 using namespace std;
 
 void testString()
-{
+{ 
+    const char* ca = "Hello";
+    const char* cb = "World";
+ 
+    String a(ca);
+    String b = cb;
+    String c("News");
 
+    a = ca;
+    b = cb;
+
+    assert(a != b);
+    assert(a < b);
+    assert(a <= b);
+    assert(!(a == b));
+    assert(!(a > b));
+    assert(!(a >= b));
+
+    assert(a == ca);
+    assert(ca == a);
+    assert(a == "Hello");
+    assert("Hello" == a);
+    
 }
 
 void testBool()
@@ -37,6 +58,13 @@ void testNumber()
     assert(r == 42);
     assert(string(r) == "42");
 
+    assert(a != b);
+
+    assert(a < b);
+    assert(a <= b);
+    assert(!(a > b));
+    assert(!(a >= b));
+    assert(!(a == b));    
     assert(a != b);
 
     assert(-a == -oa);
@@ -82,6 +110,11 @@ void testNumber()
     r = a; assert((r &= b) == (oa & ob));
     r = a; assert((r >>= 3) == (oa >> 3));
     r = a; assert((r <<= 3) == (oa << 3));
+
+    a = oa;  
+    ob = b;
+    assert(a == 20);
+    assert(ob == 22);
 }
 
 void printTypes()

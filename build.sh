@@ -113,37 +113,46 @@ function test
     $PARAMS
 }
 
-function artifacts
-{
-    cd $ARTIFACT_FOLDER
-
-    # Top level files
-    pad=0
-    for file in *.h ; do 
-        if [ -f $file ]; then            
-            echo "#include \"$file\""    
-            pad=1    
-        fi
-    done    
-    if [ $pad == 1 ]; then
-        echo 
-    fi
-
-    # Other files recursively 
-    for dir in ** ; do 
-        pad=0
-        for file in "$dir"/*.h; do
-            if [ -f $file ]; then
-                echo "#include \"$file\""        
-                pad=1
-            fi
-        done
-        if [ $pad == 1 ]; then
-            echo
+function iterateFolder
+{ 
+    # first visit subfolders
+    for dir in $1/** ; do   
+        if [ -d $dir ]; then 
+            iterateFolder $dir 
         fi
     done
 
-    echo
+    #echo $1 
+        
+    rel="${1#$ARTIFACT_FOLDER/}" 
+    echo "// -- $rel -- " >> $ARTIFACT_FILE 
+
+    # top level files
+    pad=0
+    for file in $1/*.h ; do  
+        if [ -f $file ]; then   
+            rel="${file#$ARTIFACT_FOLDER/}" 
+            echo "#include \"$rel\"" >> $ARTIFACT_FILE
+            pad=1  
+        fi
+    done    
+    
+    echo >> $ARTIFACT_FILE    
+}
+
+function buildArtifacts
+{   
+    echo "Building $ARTIFACT_FILE..."
+
+    echo "/*" > $ARTIFACT_FILE
+    echo "Auto generated artifact file" >> $ARTIFACT_FILE
+    date >> $ARTIFACT_FILE
+    echo "*/" >> $ARTIFACT_FILE
+    echo >> $ARTIFACT_FILE
+
+    iterateFolder "$ARTIFACT_FOLDER" 
+    
+    echo "DONE."    
 }
 
 #################################################
@@ -166,9 +175,7 @@ while [ "$1" != "" ]; do
         -h | --help | help )    help
                                 exit
                                 ;;
-        artifacts )             echo "Gathering artifacts files..."
-                                artifacts > "$ARTIFACT_FILE"
-                                echo "$ARTIFACT_FILE updated."
+        artifacts )             buildArtifacts
                                 exit
                                 ;;
         * )                     help

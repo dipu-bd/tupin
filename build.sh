@@ -26,11 +26,14 @@ function compile
     echo "Copying libraries..."
     cp -R "$LIB_PATH/" "$BUILD_PATH/"
 
-    echo "Compiling lex file..."
+    echo "Generating lex artifacts..."
     flex -o"$BUILD_PATH/Lexer.cpp" "$SOURCE_PATH/Lexer.l"
 
+    echo "Generating yacc artifacts..."
+    bison -do "$BUILD_PATH/Parser.cpp" "$BUILD_PATH/Parser.hpp"
+
     echo "Compiling C++ file..."
-    g++ -rdynamic -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" 
+    g++ -std=gnu++11 -o "$PROGRAM_FILE" "$BUILD_PATH/Lexer.cpp" "$BUILD_PATH/Parser.cpp" 
 
     echo "---------------- DONE ------------------"
 }
@@ -54,7 +57,7 @@ function test
     compile
 
     echo "Compiling tests..."
-    g++ -std=gnu++11 -o "$BUILD_PATH/Test.exe" "$TEST_PATH/Test.cpp"
+    g++ -rdynamic -std=gnu++11 -o "$BUILD_PATH/Test.exe" "$TEST_PATH/Test.cpp"
 
     echo "Running tests..."
     echo "----------------------------------------"

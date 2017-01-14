@@ -1,5 +1,7 @@
-%{
-    #include "lib/compiler/Lexer.hpp"
+%{    
+    #include <bits/stdc++.h>
+    #include "Parser.hpp"
+    #include "lib/Lexer.hpp"
     #define YY_USER_ACTION { loc.col += (int)yyleng; loc.line = yylineno; }
 %}
 
@@ -90,6 +92,7 @@ KEYWORDS        "def"|"return"|"if"|"elif"|"else"|"for"|"continue"|"break"|"and"
 {INVALID_NUMBER}    { yyerror("Invalid number"); }
 
     /*********** Keywords **********/
+"true"|"false"      { checkBool(yytext); }
 {KEYWORDS}          { checkKeyword(yytext); }
 
     /*********** Identifier **********/

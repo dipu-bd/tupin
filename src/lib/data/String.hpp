@@ -8,42 +8,49 @@ class String : public Object<char *>
     int __len;
 
   public:
-    String(const String& v) : Object(v.__value) { }
     String(const char *v = "") : Object(new char[0]) { set(v); }
+    String(const String &v) : Object(v.__value) { __len = v.size(); }
     String(const std::string &v = "") : Object(new char[0]) { set(v); }
 
     ~String() { delete __value; }
 
-    operator std::string() const { return __value; }
-
-    void set(const std::string &);
     void set(const char *);
-    const char *get() const;
+    void set(const std::string &);
 
-    char at(int) const;
+    void clear();
     int size() const;
-    String& append(const String &);
-    String& repeat(unsigned short);
+    char at(int) const;
+    String &append(const char *);
+    String &repeat(unsigned short);
 
+    char &operator[](int i);
     String &operator=(const char *);
-    String &operator=(const std::string &); 
-    String &operator+=(const String &);
+    String &operator=(const std::string &);
+    String &operator+=(const char *);
     String &operator*=(unsigned short);
-    String operator+(const String &) const;
+    String operator+(const char *) const;
     String operator*(unsigned short)const;
-
+    bool operator<(const char *) const;
+    bool operator>(const char *) const;
+    bool operator==(const char *) const;
+    bool operator!=(const char *) const;
+    bool operator<=(const char *) const;
+    bool operator>=(const char *) const;
 };
 
-//------------------------------------------------------------------------------
-// Member functions
-//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////////
+
+void String::clear()
+{
+    __len = 0;
+    if (__value)
+	delete __value;
+}
 
 void String::set(const char *val)
 {
-    if (__value) {
-		delete __value;
-	}
-    __value = new char[2];
+    clear();
+    __value = new char[4];
     std::strcat(__value, val);
     __len = strlen(__value);
 }
@@ -53,13 +60,6 @@ void String::set(const std::string &val)
     set(val.data());
 }
 
-const char *String::get() const
-{
-    return __value;
-}
-
-//////////////////
-
 int String::size() const
 {
     return __len;
@@ -67,67 +67,100 @@ int String::size() const
 
 char String::at(int i) const
 {
-    if (i >= 0 && i < __len) {
-		return __value[i]; 
-	}
-	return 0;
+    return (i >= 0 && i < __len) ? __value[i] : 0;
 }
 
-
-String& String::append(const String &r) 
+String &String::append(const char *r)
 {
-	std::strcat(__value, r.get());
-    __len += r.size();
+    std::strcat(__value, r);
+    __len += strlen(r);
     return *this;
 }
 
-String& String::repeat(unsigned short n) 
+String &String::repeat(unsigned short n)
 {
-	char* tmp = new char[10];		// temporary value
+    char *tmp = new char[10]; // temporary value
     for (int i = sizeof(n) - 1; i >= 0; --i)
     {
-		std::strcat(tmp, tmp); 			// doubles previous
-		if (n & (1 << i)) {
-			std::strcat(tmp, __value); 	// adds one
-		}
+	std::strcat(tmp, tmp); // doubles previous
+	if (n & (1 << i))
+	{
+	    std::strcat(tmp, __value); // adds one
+	}
     }
-	delete __value;		// free old value
-	__value = tmp;
-	__len *= n;
-	return *this;
-}
-
-//////////////////
-
-String &String::operator=(const char *val)
-{
-    set(val);
+    delete __value; // free old value
+    __value = tmp;
+    __len *= n;
     return *this;
 }
-String &String::operator=(const std::string &val)
+
+////////////////////////////////////////////////////////////////////////////////////
+
+char &String::operator[](int i)
 {
-    set(val.data());
+    if (i < 0 || i >= __len)
+    {
+		throw std::out_of_range("Array index out of bound");
+    }
+	return __value[i];
+}
+
+String &String::operator=(const char *r)
+{
+    set(r);
     return *this;
-} 
-
-String &String::operator+=(const String &r) 
+}
+String &String::operator=(const std::string &r)
 {
-	return append(r);
+    set(r.data());
+    return *this;
 }
 
-String &String::operator*=(unsigned short n) 
+String &String::operator+=(const char *r)
 {
-	return repeat(n);
+    return append(r);
 }
- 
-String String::operator+(const String &r) const 
+
+String &String::operator*=(unsigned short n)
 {
-	return String(__value).append(r);
+    return repeat(n);
+}
+
+String String::operator+(const char *r) const
+{
+    return String(__value).append(r);
 }
 
 String String::operator*(unsigned short n) const
 {
-	return String(__value).repeat(n);
+    return String(__value).repeat(n);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
+bool String::operator<(const char *r) const
+{
+    return std::strcmp(__value, r) < 0;
+}
+bool String::operator>(const char *r) const
+{
+    return std::strcmp(__value, r) > 0;
+}
+bool String::operator==(const char *r) const
+{
+    return !std::strcmp(__value, r);
+}
+bool String::operator!=(const char *r) const
+{
+    return std::strcmp(__value, r);
+}
+bool String::operator<=(const char *r) const
+{
+    return std::strcmp(__value, r) <= 0;
+}
+bool String::operator>=(const char *r) const
+{
+    return std::strcmp(__value, r) >= 0;
 }
 
 // end of file

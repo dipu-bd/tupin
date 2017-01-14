@@ -21,10 +21,19 @@ void testString()
     assert(!(a > b));
     assert(!(a >= b));
 
-    assert(a == ca);
-    assert(ca == a);
     assert(a == "Hello");
-    assert("Hello" == a);
+    assert(a <= "Hello");
+    assert("Hello" >= a);
+    assert("Hellos" != a);
+    assert("Hellos" < b);
+    assert(b > "Hellos");
+ 
+    assert(a == ca);
+    assert(a <= ca);
+    assert(ca >= a);
+    assert(ca != b);
+    assert(ca < b);
+    assert(b > ca); 
     
     assert(strlen("Hello") == a.size());
     assert(strlen("World") == b.size());

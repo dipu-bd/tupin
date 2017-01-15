@@ -64,7 +64,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
     {BADESC}        { token.val += (yytext + 1);
                       __ERROR("Unrecognized escape sequence"); }    
 }
-<sqstr>[^\\']*\'    { token.val += yytext; }
+<sqstr>[^\\']*      { token.val += yytext; }
 <sqstr>\'           { BEGIN(INITIAL); token.val += "\"";  __RETURN(STRING);  }
 <dqstr>[^\\"]*\"    { BEGIN(INITIAL); token.val += yytext; __RETURN(STRING); } 
 

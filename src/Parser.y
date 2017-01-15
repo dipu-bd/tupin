@@ -3,9 +3,11 @@
     #include "ParserHelper.hpp"    
 %}
  
-%token OP PWR PWREQ THREEDOT
+%token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID 
-%token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK AND OR NOT XOR TO BY
+%token AND OR NOT XOR
+%token EQ NEQ LEQ GEQ
+%token OP PWR PWREQ THREEDOT
  
 %union 
 {
@@ -69,11 +71,11 @@ PrintSequence:
     /*---------------------------------_ 
      |            Conditions            |
      *----------------------------------*/         
-Condition: IF '(' Expression ')' Block Branch
+Condition: IF '(' Boolean ')' Block Branch
     | IF '[' ID ']' '{' Switch '}' 
     ;
 
-Branch: ELIF '(' Expression ')' Block Branch
+Branch: ELIF '(' Boolean ')' Block Branch
     | ELSE Block
     | /* can be empty */
     ;
@@ -119,18 +121,60 @@ Params: Expression
      *----------------------------------*/    
 
 Declaration: ID '=' Expression
-    | ID '=' Array
+    | ID '=' ArrayDef
     ; 
-
-Array: '{' ParamList '}'
+ 
+ArrayDef: '{' ParamList '}'
     ;
+    
+ArrayUsage: ID '[' Expression ']'
 
     /*---------------------------------_ 
-     |            Expression            |
-     *----------------------------------*/    
-Expression: Literal
-    | Number
-    | ID { cerr << "ID" << *$<token>1 << endl; }
+     |           Expressions            |
+     *----------------------------------*/ 
+
+Expression: Expression '+' Term
+    | Expression '-' Term
+    | Term
+    ;
+
+Term: Term '*' Unary 
+    | Term '/' Unary 
+    | Unary
+    ;
+
+Unary: '!' Unary 
+    | '-' Unary 
+    | Factor
+    ;
+
+Factor: '(' Boolean ')'
+    | Literal 
+    | Location    
+    ;
+ 
+Boolean: Boolean OR Join 
+    | Join 
+    ;
+
+Join: Join AND Equality 
+    | Equality  
+    ;
+
+Equality: Equality EQ Relation
+    | Equality NEQ Relation
+    | Relation 
+    ;
+
+Relation: Expression '<' Expression
+    | Expression LEQ  Expression 
+    | Expression GEQ Expression
+    | Expression '>' Expression
+    | Expression 
+    ;
+
+Location: ID
+    | ArrayUsage
     | FunctionCall
     ;
     

@@ -1,7 +1,7 @@
 #include <iostream>
 
-#ifndef __POS__
-#define __POS__
+#ifndef __TUPIN_POS__
+#define __TUPIN_POS__
 
 class Pos
 {

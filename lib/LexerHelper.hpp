@@ -4,7 +4,7 @@ using namespace std;
 #define YY_USER_ACTION token.update(yylineno, yyleng);
 
 #define __RETURN(x) return retToken(x,#x)
-#define __ERROR(x)  yyerror(x, token.line, token.column, token.file)
+#define __ERROR(x)  yyerror(x, token.line, token.column, token.file.data())
 
 #define __NEWLINE token.newline(); // printf("\n%3d. ", yylineno); 
 #define __INITIALIZE token.update(0, 0); // printf("%3d. ", yylineno);
@@ -17,7 +17,7 @@ int retToken(int type, const char *str)
 { 
     #ifdef DEBUG
     printf("~%s:%d:%d:%s %s\n", 
-        token.file,
+        token.file.data(),
         token.line, 
         token.column, 
         str, 
@@ -32,11 +32,11 @@ int retToken(int type, const char *str)
 /* Function definitions for parser*/
 void init(int argc, char** argv)
 { 
-    if(argc >= 1) {
+    if(argc >= 1 && argv[1]) {
         token.file = argv[1];
         yyin = fopen(argv[1], "r");
     }
-    if(argc >= 2) {
+    if(argc >= 2 && argv[2]) {
         token.outfile = argv[2];
         yyout = fopen(argv[2], "w");	
     }

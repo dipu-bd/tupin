@@ -1,7 +1,7 @@
 #include <iostream>
 
-#ifndef __YYTOKEN__
-#define __YYTOKEN__
+#ifndef __TUPIN_YYTOKEN__
+#define __TUPIN_YYTOKEN__
 
 class YYToken
 {
@@ -10,13 +10,13 @@ class YYToken
     int column;
     int type;
     std::string val;
-    const char *file;
-    const char *outfile;
+    std::string file;
+    std::string outfile;
 
     YYToken()
         : line(0), column(0),
-          file("~"), outfile("~"),
-          val(""), type(-1)
+          val(""), type(-1),
+          file(""), outfile("")
     {
     }
 

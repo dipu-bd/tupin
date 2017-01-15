@@ -2,8 +2,8 @@
 #include "Pos.h"
 #include "YYToken.h"
 
-#ifndef __TOKEN__
-#define __TOKEN__
+#ifndef __TUPIN_TOKEN__
+#define __TUPIN_TOKEN__
 
 class Token
 {
@@ -17,12 +17,13 @@ public:
     {
         type = _type;
         val = tok.val;
+        file = tok.file.data();
         pos = Pos(tok.line, tok.column);
     }
 
     friend std::ostream &operator<<(std::ostream &o, const Token &t)
     {
-        return o << "~" << t.file << ":" << t.pos << ":Token " << t.val;
+        return o << "~" << t.file << ":" << t.pos << ": " << t.val;
     }
 };
 

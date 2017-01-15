@@ -130,16 +130,16 @@ Array: '{' ParamList '}'
      *----------------------------------*/    
 Expression: Literal
     | Number
-    | ID 
+    | ID { cerr << "ID" << *$<token>1 << endl; }
     | FunctionCall
     ;
     
 Literal: Number
-    | STRING
+    | STRING    { cerr << "STRING"  << *$<token>1 << endl; }
     ;
 
-Number: INT
-    | FLOAT
+Number: INT { cerr << "INT" << *$<token>1 << endl; }
+    | FLOAT { cerr<< "FLOAT"  << *$<token>1 << endl; }
     ;
 
 %% 

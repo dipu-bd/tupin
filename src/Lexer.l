@@ -29,7 +29,6 @@ INVALID_NUMBER  ({BIN}|{OCTA}|{HEXA}|{EFLOAT}|{FLOAT}|{INT})[A-Za-z]+
     /* Valid operators */
 OP_EQ           (">>"|"<<"|[-+*/%<>!|^&])=
 OP_DBL          "=="|"||"|"&&"|">>"|"<<"|"++"|"--"
-OP_SNGL         [!%&()*+,\-./:;<=>?^{|}~\[\]\\]
     /* Escape sequence */
 ESC1            [abtnvfre\"'?\\]
 ESC2            [0-7]{1,3}
@@ -77,7 +76,8 @@ BADESC          \\([^0-9]|{DIGIT}+)
 {OP_DBL}            { __RETURN_VAL(OP); }
 "**"                { __RETURN_VAL(PWR); }
 "<>"                { token="!="; __RETURN(OP); }
-{OP_SNGL}           { __RETURN_VAL(yytext[0]); }
+[-+*/%<>=!&^~]      { __RETURN_VAL(OP); }
+[.,;:?(){|}\[\]\\]  { __RETURN_VAL(yytext[0]); } 
 
 "and"               { token="&&"; __RETURN(OP); }
 "or"                { token="||";__RETURN(OP); }

@@ -9,6 +9,13 @@
 %token STRING INT FLOAT ID COMMENT
 %token OP PWR OPEQ PWREQ THREEDOT
 
+%right '=' 
+%right OPEQ PWREQ
+%left '<' '>'  
+%left OP '&' '^' '|'
+%left '+' '-' '*' '/' '%'
+%left PWR
+
 %%
     /*---------------------------------_ 
      |            Start Point           |
@@ -18,6 +25,7 @@ Program: Combined     { saveProgram($1); }
     
 Combined: Combined Block    { $$ = $1 + "\n{\n" + tab($2) + "\n}\n"; /*"*/}
     | Combined Function     { $$ = $1 + "\n" + $2 + "\n"; } 
+    /* | Combined COMMENT   { $$ = $1 + "\n" + $2; } */
     | /* empty program */   { $$ = ""; }
     ;
 
@@ -38,21 +46,19 @@ ArgVarList: ArgVarList ',' ID { $$ = $1 + "\n" + $3; }
     /*---------------------------------_ 
      |        Block's Definition        |
      *----------------------------------*/     
-Block : Loop        { $$ = $1; }
+Block: Loop        { $$ = $1; }
     | Condition     { $$ = $1; }
     | Statement     { $$ = $1; } 
-    | Block Block   { $$ = $1 + "\n" + $2; }
     ;
 
 Statement: SingleStmnt ';'  { $$ = $1 + ";"; }
     | '{' Block '}'         { $$ = "{\n" + tab($2) + "\n}"; } /*"*/
-    | COMMENT               { $$ = $1; }
     ;
 
 SingleStmnt: Declaration    { $$ = $1; }
     | PrintStmnt            { $$ = $1; }
     | Expression            { $$ = $1; }     
-    | RETURN Expression     { $$ =  $1 + $2; }
+    | RETURN Expression     { $$ = $1 + $2; }
     | CONTINUE              { $$ = $1; }
     | BREAK                 { $$ = $1; }
     ;
@@ -82,6 +88,7 @@ ConditionStmnt:
                 { $$ = "(" + $2 + ")\n" + tab($4) + ";\n" + $6; }  
         | '(' Expression ')' '{' Block '}' Branch   
                 { $$ = "(" + $2 + ") {\n" + tab($5) + "\n}\n" + $7; /*"*/ } 
+    ;
 
 Branch: ELIF ConditionStmnt { $$ = "else if " + $2; }
     | ELSE SingleStmnt ';' { $$ = "else " + tab($2) + ";"; }
@@ -140,55 +147,40 @@ Declaration: ID '=' Expression      { $$ = "auto " + $1 + " = " + $3; }
 ArrayDef: '{' ParamList '}'         { $$ = "Array(" + $2 + ")"; }
     ;
     
-ArrayUsage: ID IndexList   { $$ = $1 + $2; }
+ArrayUsage: ID IndexList            { $$ = $1 + $2; }
     ;
 
 IndexList: '[' CommaIndex ']'       { $$ = $2; }
     | IndexList '[' CommaIndex ']'  { $$ = $1 + $3; }
     ;
 
-CommaIndex: Expression          { $$ = "[(" + $1 + ")]"; }
-    | CommaIndex ',' Expression   { $$ = $1 + "[(" + $3 + ")]"; }
+CommaIndex: Expression              { $$ = "[(" + $1 + ")]"; }
+    | CommaIndex ',' Expression     { $$ = $1 + "[(" + $3 + ")]"; }
     ;
 
     /*---------------------------------_ 
      |           Expressions            |
      *----------------------------------*/ 
 
-Expression: Expression Operator Unary { $$ = $1 + $2 + $3; }    
+Expression: Expression OP Unary { $$ = $1 + $2 + $3; }    
     | Expression PWR Unary { $$ = "power(" + $1 + ", " + $3 + ")"; }  
+    | ID OPEQ Expression  { $$ = $1 + $2 + $3; }
+    | ID PWREQ Expression   { $$ = $1 + "=power(" + $1 + "," + $3 + ")"; }
+    | ID '=' Expression { $$ = $1 + $2 + $3; }
     | Unary      { $$ = $1; }
-    ;
+    ; 
 
-Operator: '+'   { $$ = $1; }
-    | '-'   { $$ = $1; }
-    | '*'   { $$ = $1; }
-    | '/'   { $$ = $1; }
-    | '%'   { $$ = $1; }
-    | '|'   { $$ = $1; }
-    | '^'   { $$ = $1; }
-    | '&'   { $$ = $1; }
-    | '<'   { $$ = $1; }
-    | '>'   { $$ = $1; }
-    | OP    { $$ = $1; }
-    
 Unary: '~' Unary { $$ = "~" + $1; }
     | '-' Unary { $$ = "-" + $1; }
     | '!' Unary { $$ = "!" + $1; }
     | Factor { $$ = $1; }
     ;
 
-Factor: '(' Expression ')'  { $$ = "(" + $2 + ")" ; }
-    | Assignment            { $$ = $1;}
+Factor: '(' Expression ')'  { $$ = "(" + $2 + ")" ; } 
     | Literal               { $$ = $1; }
     | ID                    { $$ = $1; }
     | ArrayUsage            { $$ = $1; }
     | FunctionCall          { $$ = $1; }
-    ;
-
-Assignment: ID OPEQ Expression  { $$ = $1 + $2 + $3; }
-    | ID '=' Expression { $$ = $1 + $2 + $3; }
-    | ID PWREQ Expression   { $$ = "power(" + $1 + ", " + $3 + ")"; }
     ;
  
 Literal: Number { $$ = $1; }

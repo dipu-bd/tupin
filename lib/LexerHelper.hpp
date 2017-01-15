@@ -4,7 +4,7 @@ using namespace std;
 #define __NEWLINE newLine(); // printf("\n%3d. ", yylineno);
 #define __INITIALIZE         // printf("%3d. ", yylineno);
 
-#define __ERROR(x) yyerror(x, line, column, env.sourceFile());
+#define __ERROR(x) yyerror(x, line, column, env.sourceFile().data());
 
 #define YY_USER_ACTION updateColumn(yyleng);
 
@@ -17,7 +17,7 @@ using namespace std;
 string token;
 int line = 0;
 int column = 0;
-Environment env;
+FileSystem env;
 
 void newLine()
 {
@@ -34,24 +34,22 @@ void updateColumn(int len)
 int retToken(int type, const char *str)
 {
 #ifdef YYDEBUG
-    printf("~%s:%d:%d:%s %s\n",
-           env.sourceFile(),
-           line,
-           column,
-           str,
-           token.data());
+    printf("~%s:", env.sourceFile().data());
+    printf("%d:%d:%s ", line, column, str);
+    printf("%s\n", token.data());
 #endif
 
     if (yylval.token)
         delete yylval.token;
-    yylval.token = new Token(type, line, col, token, env.sourceFile());
+    yylval.token = new Token(type, line, column, token.data());
     return type;
 }
 
 /* Function definitions for parser*/
 void init(int argc, char **argv)
 {
-    env = Environment(argc, argv);
+    env = FileSystem(argc, argv);
+
     if (argc > 1 && argv[1])
     {
         yyin = fopen(argv[1], "r");

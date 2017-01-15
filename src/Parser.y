@@ -14,6 +14,8 @@
     Token* token;
 }
 
+%type <token> STRING INT FLOAT ID
+
 %%
     /*---------------------------------_ 
      |            Start Point           |
@@ -143,12 +145,12 @@ Term: Term '*' Unary
     | Unary
     ;
 
-Unary: '!' Unary 
+Unary: '~' Unary 
     | '-' Unary 
     | Factor
     ;
 
-Factor: '(' Boolean ')'
+Factor: '(' Boolean ')' 
     | Literal 
     | Location    
     ;
@@ -157,7 +159,10 @@ Boolean: Boolean OR Join
     | Join 
     ;
 
-Join: Join AND Equality 
+Join: Join AND UnaryBoolean
+    | UnaryBoolean 
+    ;
+UnaryBoolean: '!' Equality 
     | Equality  
     ;
 
@@ -173,9 +178,9 @@ Relation: Expression '<' Expression
     | Expression 
     ;
 
-Location: ID
+Location: ID    { cerr << "ID"  << *$<token>1 << endl; }
     | ArrayUsage
-    | FunctionCall
+    | FunctionCall  
     ;
     
 Literal: Number

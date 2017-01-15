@@ -1,5 +1,11 @@
 T = rand(1,25);
 [T];
+
+
+{ 
+    /* empty statement test */
+}
+
 for x : range(1,T) {
   ['\n'];
   [rand(0,20)];

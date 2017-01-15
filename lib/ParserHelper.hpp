@@ -90,7 +90,7 @@ string defFunction(string name, string args, string block)
 
     string func = "template <" + tmp + "> \n";
     func += retType + " " + name + "(" + arglist + ") {\n";
-    func += tab(block) + "\n}";
+    func += block;
     return func;
 }
 

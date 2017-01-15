@@ -6,11 +6,11 @@ def main() {
   [T = rand(1,20)];
 
   for range(T-1) {    // no index variable is defined.     
+    n = rand(1,500);
+    m = rand(0, 16000);
     [
       '\n\n'
-      n = rand(1,500)
-      ' '
-      m = rand(0, 16000)
+      n ' ' m 
     ];        
     for i : range(m-1) {  // index variable i is local to this scope only.
       /* 

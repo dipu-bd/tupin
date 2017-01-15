@@ -2,7 +2,11 @@
 regex = "[a-z]+";   
 
 /* a function definition */
-
+def gen() 
+{
+  len = rand(1, 10);  
+  return randrx(len, regex);  // generates random string of len length from regular expression.
+}
 
 [T = rand(1,50)];
 for range(T-1) {

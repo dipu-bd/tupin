@@ -17,7 +17,7 @@ SPACE           [ \t\r\v\f]
 DIGIT           [0-9] 
 XDIGIT          [A-Fa-f0-9]
     /* Identifier */
-ID              [_$A-Za-z]([_$A-Za-z0-9])*
+IDF             [_$A-Za-z]([_$A-Za-z0-9])*
     /* Number system */
 INT             {DIGIT}+
 FLOAT           {INT}"."{DIGIT}*  
@@ -113,7 +113,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 }
 
     /*********** Identifier **********/
-<INITIAL>{ID}       { __RETURN_VAL(ID); }
+<INITIAL>{IDF}       { token = yytext; token = "$" + token + "$"; __RETURN(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
 

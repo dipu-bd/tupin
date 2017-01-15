@@ -4,6 +4,6 @@ T = rand(100,125); // get a random between 100 and 125, inclusive
 [T];    // prints T
 
 /* loops from 0 to T - 1 */
-for range(T-1) { 
+for[ range(T-1) ]{ 
     ['\n' rand(0,10) ' ' rand(0,10)];   // prints two space separated numbers
 }

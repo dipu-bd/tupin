@@ -10,13 +10,6 @@
 %token AND OR NOT XOR
 %token EQ NEQ LEQ GEQ
 %token OP PWR PWREQ THREEDOT
- 
-%union 
-{
-    Token* token;
-}
-
-%type <token> STRING INT FLOAT ID
 
 %%
     /*---------------------------------_ 
@@ -180,17 +173,17 @@ Relation: Expression '<' Expression
     | Expression 
     ;
 
-Location: ID   
+Location: ID        
     | ArrayUsage
     | FunctionCall  
     ;
     
-Literal: Number
-    | STRING   
+Literal: Number { $$ = $1; }
+    | STRING    { $$ = $1; }
     ;
 
-Number: INT 
-    | FLOAT 
+Number: INT { $$ = $1; }
+    | FLOAT { }
     ;
 
 %% 

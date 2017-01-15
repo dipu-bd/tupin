@@ -38,10 +38,8 @@ int retToken(int type, const char *str)
     printf("%d:%d:%s ", line, column, str);
     printf("%s\n", token.data());
 #endif
-
-    if (yylval.token)
-        delete yylval.token;
-    yylval.token = new Token(type, line, column, token.data());
+ 
+    yylval = Token(type, line, column, token.data());
     return type;
 }
 

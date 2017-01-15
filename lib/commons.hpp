@@ -3,6 +3,7 @@
 #include "FileSystem.h"
 
 #define YYDEBUG 1
+#define YYSTYPE Token
 
 int yylex (void);
 int yyparse(void);

@@ -6,29 +6,20 @@
 %verbose 
  
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK TO BY
-%token STRING INT FLOAT ID 
+%token STRING INT FLOAT ID COMMENT
 %token OP PWR OPEQ PWREQ THREEDOT
 
 %%
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Header     { 
-                cout << "#include \"tupin.hpp\"\n" 
-                     << "using namespace std;\n"
-                     << "using namespace tupin;\n"
-                     << "\n"
-                     << $1
-                     << "\n"
-                     << "\nint main() {\n"
-                     << tab("return 0;")
-                     << "\n}\n\n"; 
-                /*"*/ }
+Program: Combined     { saveProgram($1); }
     ;
     
-Header: Header Block       { $$ = $1 + "\n{\n" + tab($2) + "\n}"; /*"*/}
-    | Header Function      { $$ = $1 + "\n" + $2; }
-    | /* empty program */  { $$ = ""; }
+Combined: Combined Block    { $$ = $1 + "\n{\n" + tab($2) + "\n}"; /*"*/}
+    | Combined Function     { $$ = $1 + "\n" + $2; }
+    | Combined COMMENT      { $$ = $1 + $2; }
+    | /* empty program */   { $$ = ""; }
     ;
 
     /*---------------------------------_ 

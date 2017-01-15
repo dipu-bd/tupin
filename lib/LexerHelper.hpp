@@ -43,21 +43,6 @@ int retToken(int type, const char *str)
     return type;
 }
 
-/* Function definitions for parser*/
-void init(int argc, char **argv)
-{
-    env = FileSystem(argc, argv);
-
-    if (argc > 1 && argv[1])
-    {
-        yyin = fopen(argv[1], "r");
-    }
-    if (argc > 2 && argv[2])
-    {
-        yyout = fopen(argv[2], "w");
-    }
-}
-
 /* Function definitions for lexer*/
 std::string toNumber(const char *s, int base = 10)
 {

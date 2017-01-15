@@ -9,11 +9,9 @@ LIB_PATH="lib"
 TEST_PATH="test" 
 ARTIFACT_FOLDER="lib/artifact"
 
-PROGRAM_FILE="$BUILD_PATH/Program.exe"
-
-PARAMS=""
 INPUT_FILE=""
 OUTPUT_FILE=""
+PROGRAM_FILE="$BUILD_PATH/Program.exe"
 
 #################################################
  
@@ -52,7 +50,7 @@ function compile
     if [ -f $YACCPP ]; then
         if [ -f $LEXCPP ]; then
                 echo "Compiling C++ file..."
-                g++ -std=gnu++11 -o $PROGRAM_FILE $LEXCPP $YACCPP
+                g++ -std=gnu++14 -o $PROGRAM_FILE $LEXCPP $YACCPP
         else
             echo "~ERROR: $LEXCPP not found.";
         fi
@@ -76,16 +74,16 @@ function attachParam
 
 function run
 {   
-    PARAMS="./$PROGRAM_FILE"    
-    if [ ! -f $PARAMS ]; then
+    if [ ! -f $PROGRAM_FILE ]; then
         echo "No program file."
         exit 1
     fi  
+    
+    PARAMS="./$PROGRAM_FILE $INPUT_FILE $OUTPUT_FILE"
 
     echo "Starting program..."
     echo "$PARAMS"
     echo "-------------------------------------------------"    
-    attachParam
     $PARAMS
 }
 
@@ -95,13 +93,15 @@ function test
     cp -a "$TEST_PATH/." "$BUILD_PATH"
 
     echo "Compiling tests..."
-    g++ -rdynamic -std=gnu++11 -o "$BUILD_PATH/Test.exe" "$BUILD_PATH/Test.cpp"
+    g++ -rdynamic -std=gnu++14 -o "$BUILD_PATH/Test.exe" "$BUILD_PATH/Test.cpp"
 
     PARAMS="$BUILD_PATH/Test.exe"
     if [! -f  $PARAMS ]; then
         echo "No program file."
         exit 1
     fi 
+
+    PARAMS="./$PARAMS $INPUT_FILE $OUTPUT_FILE"
 
     echo "Running tests..."
     echo "$PARAMS"
@@ -180,7 +180,7 @@ while [ "$1" != "" ]; do
 done
 
 # RUN TASKS AT LAST
-buildArtifacts
+#buildArtifacts
 compile
 if [ $RUN_TASK == 1 ]; then 
     run

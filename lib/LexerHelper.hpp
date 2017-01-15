@@ -1,21 +1,34 @@
 using namespace std;
 
 /* Predefined actions */
-#define YY_USER_ACTION token.update(yylineno, yyleng);
-
 #define __RETURN(x) return retToken(x,#x);
 #define __RETURN_VAL(x) token.val = yytext; return retToken(x,#x);
 #define __ERROR(x)  yyerror(x, token.line, token.column, token.file.data());
 
-#define __NEWLINE token.newline(); // printf("\n%3d. ", yylineno); 
-#define __INITIALIZE token.update(0, 0); // printf("%3d. ", yylineno);
+#define __NEWLINE newLine(); // printf("\n%3d. ", yylineno); 
+#define __INITIALIZE // printf("%3d. ", yylineno);
+
+#define YY_USER_ACTION updateColumn(yyleng);
 
 /* Creating instance of YYToken */
-YYToken token;
+int line = 0;
+int column = 0;
+Environment env;
+
+void newLine()
+{
+    line++;
+    column = 0;
+}
+
+void updateColumn(int len)
+{
+    column += len;
+}
 
 /* Debuggin and token returns */
 int retToken(int type, const char *str)
-{ 
+{
     #ifdef YYDEBUG
     printf("~%s:%d:%d:%s %s\n", 
         token.file.data(),
@@ -26,19 +39,18 @@ int retToken(int type, const char *str)
     #endif
 
     if(yylval.token) delete yylval.token;
-    yylval.token = new Token(type, token);
+    yylval.token = new Token(type, line, col, env.sourceFile());
     return type;
 } 
 
 /* Function definitions for parser*/
 void init(int argc, char** argv)
 { 
-    if(argc >= 1 && argv[1]) {
-        token.file = argv[1];
+    env = Environment(argc, argv);
+    if(argc > 1 && argv[1]) {
         yyin = fopen(argv[1], "r");
     }
-    if(argc >= 2 && argv[2]) {
-        token.outfile = argv[2];
+    if(argc > 2 && argv[2]) {
         yyout = fopen(argv[2], "w");	
     }
 }

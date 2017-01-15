@@ -13,12 +13,12 @@ public:
     std::string val;    
     const char *file;
 
-    Token(int _type, const YYToken& tok)
+    Token(int _type, const Token& tok, const char* _file)
     {
-        type = _type;
+        file = _file;
+        pos = tok.pos;
         val = tok.val;
-        file = tok.file.data();
-        pos = Pos(tok.line, tok.column);
+        type = tok.type;
     }
 
     friend std::ostream &operator<<(std::ostream &o, const Token &t)

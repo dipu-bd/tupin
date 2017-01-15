@@ -1,6 +1,6 @@
 /*
  * Auto generated artifact file
- * Sun Jan 15 18:10:09 BDT 2017
+ * Sun Jan 15 18:42:59 BDT 2017
  */
 
 // -- artifact/controls/condition -- 
@@ -17,11 +17,11 @@
 
 // -- artifact/data -- 
 #include "artifact/data/Array.h"
-#include "artifact/data/FLOAT.h"
-#include "artifact/data/INT.h"
-#include "artifact/data/Literal.h"
+#include "artifact/data/Bool.h"
+#include "artifact/data/Float.h"
+#include "artifact/data/Integer.h"
 #include "artifact/data/Number.h"
-#include "artifact/data/STRING.h"
+#include "artifact/data/String.h"
 
 // -- artifact/expression -- 
 #include "artifact/expression/Expression.h"

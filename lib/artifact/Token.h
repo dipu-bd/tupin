@@ -20,9 +20,9 @@ class Token : public Pos
     {
     }
 
-    std::string data() const
+    const char* data() const
     {
-        return val;
+        return val.data();
     }
 
     friend std::ostream &operator<<(std::ostream &o, const Token &t)

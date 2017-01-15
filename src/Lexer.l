@@ -80,7 +80,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "**"                { __RETURN_VAL(PWR); }
 "<>"                { token.val="!="; __RETURN(NEQ); }
 {OP_EQ}|{OP_DBL}    { __RETURN_VAL(OP); }
-{OP_SNGL}           { __RETURN(yytext[0]); }
+{OP_SNGL}           { __RETURN_VAL(yytext[0]); }
 
 
     /*********** Numbers **********/    
@@ -110,7 +110,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "by"                { __RETURN(BY); } 
 
     /*********** Identifier **********/
-{IDENTIFIER}        { token.val = yytext; __RETURN(ID); }
+{IDENTIFIER}        { __RETURN_VAL(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
 <*>\n              { __NEWLINE; } 

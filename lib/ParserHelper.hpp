@@ -9,7 +9,7 @@ int MainFunction(int argc, char** argv)
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
-    fprintf(stderr, "\n\nExited with status %d.\nRuntime: %f ms\n", res, duration / 1e6);
+    fprintf(stderr, "\n\nExited with status %d\nRuntime: %f ms.\n", res, duration / 1e6);
 
     return res;
 }

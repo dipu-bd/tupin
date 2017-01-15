@@ -2,6 +2,8 @@
     #include "commons.hpp"    
     #include "ParserHelper.hpp"    
 %}
+
+%verbose 
  
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID 
@@ -178,23 +180,23 @@ Relation: Expression '<' Expression
     | Expression 
     ;
 
-Location: ID    { cerr << "ID"  << *$<token>1 << endl; }
+Location: ID   
     | ArrayUsage
     | FunctionCall  
     ;
     
 Literal: Number
-    | STRING    { cerr << "STRING"  << *$<token>1 << endl; }
+    | STRING   
     ;
 
-Number: INT { cerr << "INT" << *$<token>1 << endl; }
-    | FLOAT { cerr<< "FLOAT"  << *$<token>1 << endl; }
+Number: INT 
+    | FLOAT 
     ;
 
 %% 
 
 int main(int argc, char** argv)
-{
+{ 
     return MainFunction(argc, argv);
 }
 

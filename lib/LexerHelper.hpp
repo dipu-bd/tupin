@@ -16,7 +16,7 @@ YYToken token;
 /* Debuggin and token returns */
 int retToken(int type, const char *str)
 { 
-    #ifdef DEBUG
+    #ifdef YYDEBUG
     printf("~%s:%d:%d:%s %s\n", 
         token.file.data(),
         token.line, 

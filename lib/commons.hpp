@@ -1,6 +1,8 @@
 #include <bits/stdc++.h> 
 #include "artifacts.h"
 
+#define YYDEBUG 1
+
 int yylex (void);
 int yyparse(void);
 

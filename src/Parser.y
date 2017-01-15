@@ -57,6 +57,7 @@ ArgDef: ID  { $$ = "auto " + $1; }
 Block : Loop        { $$ = $1; }
     | Condition     { $$ = $1; }
     | Statement     { $$ = $1; }
+    | Block Block   { $$ = $1 + "\n" + $2; }
     ;
 
 Statement: SingleStmnt ';'  { $$ = $1 + ";"; }

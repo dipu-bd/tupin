@@ -57,23 +57,29 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "//"[^\n]*          /* eat up single line comment */
 
     /*********** Strings **********/ 
-<INITIAL>"\'"       { BEGIN(sqstr); token.val = yytext; }
+<INITIAL>"\'"       { BEGIN(sqstr); token.val = "\""; }
 <INITIAL>"\""       { BEGIN(dqstr); token.val = yytext; }
 <sqstr,dqstr>{
     {ESCAPE}        { token.val += yytext; }
     {BADESC}        { token.val += (yytext + 1);
                       __ERROR("Unrecognized escape sequence"); }    
 }
+<sqstr>[^\\']*\'    { token.val += yytext; }
+<sqstr>\'           { BEGIN(INITIAL); token.val += "\"";  __RETURN(STRING);  }
 <dqstr>[^\\"]*\"    { BEGIN(INITIAL); token.val += yytext; __RETURN(STRING); } 
-<sqstr>[^\\']*\'    { token.val += yytext; token.val[0] = token.val[yyleng-1] = '"';  
-                      BEGIN(INITIAL); __RETURN(STRING);  }
 
     /*********** Operators **********/
-"..."               { __RETURN(THREEDOT); }
-"**="               { __RETURN(PWREQ); }
-{OP_EQ}|{OP_DBL}    { token.val = yytext; __RETURN(OP); }
-"**"                { __RETURN(PWR); }
-"<>"                { token.val = "!="; __RETURN(OP); }
+"..."               { __RETURN_VAL(THREEDOT); }
+"**="               { __RETURN_VAL(PWREQ); }
+"&&"                { __RETURN_VAL(AND); }
+"||"                { __RETURN_VAL(OR); }
+"=="                { __RETURN_VAL(EQ); }
+"!="                { __RETURN_VAL(NEQ); }
+"<="                { __RETURN_VAL(LEQ); }
+">="                { __RETURN_VAL(GEQ); }
+"**"                { __RETURN_VAL(PWR); }
+"<>"                { token.val="!="; __RETURN(NEQ); }
+{OP_EQ}|{OP_DBL}    { __RETURN_VAL(OP); }
 {OP_SNGL}           { __RETURN(yytext[0]); }
 
 

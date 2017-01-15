@@ -3,8 +3,9 @@ using namespace std;
 /* Predefined actions */
 #define YY_USER_ACTION token.update(yylineno, yyleng);
 
-#define __RETURN(x) return retToken(x,#x)
-#define __ERROR(x)  yyerror(x, token.line, token.column, token.file.data())
+#define __RETURN(x) return retToken(x,#x);
+#define __RETURN_VAL(x) token.val = yytext; return retToken(x,#x);
+#define __ERROR(x)  yyerror(x, token.line, token.column, token.file.data());
 
 #define __NEWLINE token.newline(); // printf("\n%3d. ", yylineno); 
 #define __INITIALIZE token.update(0, 0); // printf("%3d. ", yylineno);

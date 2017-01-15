@@ -1,44 +1,47 @@
 /*
-Auto generated artifact file
-Sun Jan 15 05:47:57 BDT 2017
-*/
+ * Auto generated artifact file
+ * Sun Jan 15 14:45:30 BDT 2017
+ */
 
-// -- controls/condition -- 
-#include "controls/condition/Branch.h"
-#include "controls/condition/Condition.h"
-#include "controls/condition/Switch.h"
+// -- artifact/controls/condition -- 
+#include "artifact/controls/condition/Branch.h"
+#include "artifact/controls/condition/Condition.h"
+#include "artifact/controls/condition/Switch.h"
 
-// -- controls/loop -- 
-#include "controls/loop/BooleanLoop.h"
-#include "controls/loop/IteratorLoop.h"
-#include "controls/loop/Loop.h"
+// -- artifact/controls/loop -- 
+#include "artifact/controls/loop/BooleanLoop.h"
+#include "artifact/controls/loop/IteratorLoop.h"
+#include "artifact/controls/loop/Loop.h"
 
-// -- controls -- 
+// -- artifact/controls -- 
 
-// -- data -- 
-#include "data/Array.h"
-#include "data/FLOAT.h"
-#include "data/INT.h"
-#include "data/Literal.h"
-#include "data/Number.h"
-#include "data/STRING.h"
+// -- artifact/data -- 
+#include "artifact/data/Array.h"
+#include "artifact/data/FLOAT.h"
+#include "artifact/data/INT.h"
+#include "artifact/data/Literal.h"
+#include "artifact/data/Number.h"
+#include "artifact/data/STRING.h"
 
-// -- expression -- 
-#include "expression/Expression.h"
+// -- artifact/expression -- 
+#include "artifact/expression/Expression.h"
 
-// -- functions -- 
-#include "functions/FunctionCall.h"
-#include "functions/Function.h"
+// -- artifact/functions -- 
+#include "artifact/functions/FunctionCall.h"
+#include "artifact/functions/Function.h"
 
-// -- statements -- 
-#include "statements/Block.h"
-#include "statements/PrintStmnt.h"
-#include "statements/SingleStmnt.h"
-#include "statements/Statement.h"
+// -- artifact/statements -- 
+#include "artifact/statements/Block.h"
+#include "artifact/statements/PrintStmnt.h"
+#include "artifact/statements/SingleStmnt.h"
+#include "artifact/statements/Statement.h"
 
-// -- variables -- 
-#include "variables/Declaration.h"
+// -- artifact/variables -- 
+#include "artifact/variables/Declaration.h"
 
-// -- lib/artifact -- 
-#include "Program.h"
+// -- artifact -- 
+#include "artifact/Pos.h"
+#include "artifact/Program.h"
+#include "artifact/Token.h"
+#include "artifact/YYToken.h"
 

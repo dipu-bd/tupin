@@ -16,7 +16,7 @@ int MainFunction(int argc, char** argv)
 
 void yyerror(const char *msg, int line, int col, const char* file = "")
 {
-    fprintf(stderr, "%4s:%d:%d: %s\n", file, line, col, msg);
+    fprintf(stderr, "~%4s:%d:%d: %s\n", file, line, col, msg);
 }
 
 void yyerror(const char *msg)

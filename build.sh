@@ -6,17 +6,14 @@
 BUILD_PATH=".build"
 SOURCE_PATH="src"
 LIB_PATH="lib"
-TEST_PATH="test"
-
-ARTIFACT_FILE="lib/artifacts.h"
+TEST_PATH="test" 
 ARTIFACT_FOLDER="lib/artifact"
+
+PROGRAM_FILE="$BUILD_PATH/Program.exe"
 
 PARAMS=""
 INPUT_FILE=""
 OUTPUT_FILE=""
-
-
-PROGRAM_FILE="$BUILD_PATH/Program.exe"
 
 #################################################
  
@@ -118,39 +115,37 @@ function iterateFolder
     # first visit subfolders
     for dir in $1/** ; do   
         if [ -d $dir ]; then 
-            iterateFolder $dir 
+            iterateFolder $dir $2 $3
         fi
     done
 
     #echo $1 
         
-    rel="${1#$ARTIFACT_FOLDER/}" 
-    echo "// -- $rel -- " >> $ARTIFACT_FILE 
+    rel="${1#$3/}" 
+    echo "// -- $rel -- " >> $2 
 
-    # top level files
-    pad=0
+    # top level files 
     for file in $1/*.h ; do  
         if [ -f $file ]; then   
-            rel="${file#$ARTIFACT_FOLDER/}" 
-            echo "#include \"$rel\"" >> $ARTIFACT_FILE
-            pad=1  
+            echo "#include \"${file#$3/}\"" >> $2
         fi
     done    
     
-    echo >> $ARTIFACT_FILE    
+    echo >> $2
 }
 
 function buildArtifacts
 {   
-    echo "Building $ARTIFACT_FILE..."
+    file="$LIB_PATH/artifacts.h"
+    echo "Building $file..."
 
-    echo "/*" > $ARTIFACT_FILE
-    echo "Auto generated artifact file" >> $ARTIFACT_FILE
-    date >> $ARTIFACT_FILE
-    echo "*/" >> $ARTIFACT_FILE
-    echo >> $ARTIFACT_FILE
-
-    iterateFolder "$ARTIFACT_FOLDER" 
+    echo "/*" > $file
+    echo " * Auto generated artifact file" >> $file
+    echo " * $(date)" >> $file
+    echo " */" >> $file
+    echo >> $file
+    
+    iterateFolder "$ARTIFACT_FOLDER" "$file" "$LIB_PATH"
     
     echo "DONE."    
 }
@@ -185,6 +180,7 @@ while [ "$1" != "" ]; do
 done
 
 # RUN TASKS AT LAST
+buildArtifacts
 compile
 if [ $RUN_TASK == 1 ]; then 
     run

@@ -2,10 +2,6 @@
     #include "commons.hpp"
     #include "Parser.hpp"
     #include "LexerHelper.hpp"
-
-    #define YY_USER_ACTION token.update(yylineno, yyleng);
-    #define __RETURN(x) return retToken(x,#x)
-    #define __ERROR(x)  yyerror(x, token.line, token.column, token.file.data())
 %}
 
 %option warn
@@ -46,8 +42,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     /*********** Initialization **********/       
-    token.update(0, 0);
-    //printf("%3d. ", yylineno);
+    __INITIALIZE;
     
     /*********** Whitespaces **********/
 {SPACE}		        /* skip whitespace */
@@ -112,6 +107,6 @@ BADESC          \\([^0-9]|{DIGIT}+)
 {IDENTIFIER}        { token.val = yytext; __RETURN(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
-<*>\n              { token.clear(); } /* printf("\n%3d. ", yylineno); */
+<*>\n              { __NEWLINE; } 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

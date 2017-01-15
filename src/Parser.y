@@ -26,12 +26,13 @@ Combined: Combined Block    { $$ = $1 + "\n{\n" + tab($2) + "\n}"; /*"*/}
      |       Functoin Definition        |
      *----------------------------------*/    
 Function: DEF ID '(' Arguments ')' '{' Block '}'  {
-                   $$ = "template <typename T>\n"; 
-                   $$ += "T " + $2 + "(" + $4 + ") {\n"; 
-                   $$ += tab($7) + "\n}"; } /* " */
+                        $$ = "template <typename T>\n"; 
+                        $$ += "T " + $2 + "(" + $4 + ") {\n"; 
+                        $$ += tab($7) + "\n}";/*"*/ 
+                    } 
     ; 
 
-Arguments:  /* can be empty */
+Arguments: { $$ = ""; } /* can be empty */ 
     | ArgVarList { $$ = $1; } 
     ;
 
@@ -108,15 +109,15 @@ Loop: FOR '(' Expression ')' '{' Block '}'
             { $$ = "while (" + $3 + ") {\n" + tab($6) + "\n}"; /*"*/ }
     | FOR '(' Declaration ';' Expression ';' Expression ')' '{' Block '}'
             { $$ = "for (" + $3 + "; " + $5 + "; " + $7 + ") {\n" + tab($10) + "\n}"; /*"*/ }
-    | FOR '[' LoopIterator ']' '{' Block '}'
-            { $$ = "for (auto __i : " + $3 + ") {\n" + tab($6) + "\n}"; /*"*/ }
-    | FOR '[' ID ':' LoopIterator ']' '{' Block '}'
-            { $$ = "for (auto " + $3 + " : " + $5 + ") {\n" + tab($8) + "\n}"; /*"*/ }
+    | FOR LoopIterator '{' Block '}'
+            { $$ = "for (auto __i : " + $2 + ") {\n" + tab($4) + "\n}"; /*"*/ }
+    | FOR ID ':' LoopIterator '{' Block '}'
+            { $$ = "for (auto " + $2 + " : " + $4 + ") {\n" + tab($6) + "\n}"; /*"*/ }
     ;
 
 LoopIterator: 
-    | Literal TO Literal                { $$ = "tupin::range(" + $1 + ", " + $3 +")"; }
-    | Literal TO Literal BY Literal     { $$ = "tupin::range(" + $1 + ", " + $3 + ", " + $5 +")"; }
+    | Literal TO Literal                { $$ = "range(" + $1 + ", " + $3 +")"; }
+    | Literal TO Literal BY Literal     { $$ = "range(" + $1 + ", " + $3 + ", " + $5 +")"; }
     | Expression                        { $$ = "(" + $1 + ")"; }
     ;
 
@@ -161,7 +162,7 @@ CommaIndex: Expression          { $$ = "[(" + $1 + ")]"; }
      *----------------------------------*/ 
 
 Expression: Expression Operator Unary { $$ = $1 + $2 + $3; }    
-    | Expression PWR Unary { $$ = "tupin::power(" + $1 + ", " + $3 + ")"; }  
+    | Expression PWR Unary { $$ = "power(" + $1 + ", " + $3 + ")"; }  
     | Unary      { $$ = $1; }
     ;
 
@@ -193,7 +194,7 @@ Factor: '(' Expression ')'  { $$ = "(" + $2 + ")" ; }
 
 Assignment: ID OPEQ Expression  { $$ = $1 + $2 + $3; }
     | ID '=' Expression { $$ = $1 + $2 + $3; }
-    | ID PWREQ Expression   { $$ = "tupin::power(" + $1 + ", " + $3 + ")"; }
+    | ID PWREQ Expression   { $$ = "power(" + $1 + ", " + $3 + ")"; }
     ;
  
 Literal: Number { $$ = $1; }

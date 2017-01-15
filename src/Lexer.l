@@ -48,13 +48,13 @@ BADESC          \\([^0-9]|{DIGIT}+)
 {SPACE}		        /* skip whitespace */
 
     /*********** Comments **********/
-<INITIAL>"/*"       { BEGIN(comment); }
+<INITIAL>"/*"       { /*"*/ BEGIN(comment); token = yytext; }
 <comment>{
-    [^*\n]*         /* eat anything that's not a '*' */
-    "*"+[^*/\n]*    /* eat up '*'s not followed by '/'s  */ 
-    "*/"            { BEGIN(INITIAL); }
+    [^*\n]*         { token += yytext; }
+    "*"+[^*/\n]*    { token += yytext; }
+    "*/"            { BEGIN(INITIAL); token += yytext; __RETURN(COMMENT); }
 }
-"//"[^\n]*          /* eat up single line comment */
+"//"[^\n]*          { token = yytext; __RETURN(COMMENT); }
 
     /*********** Strings **********/ 
 <INITIAL>"\'"       { BEGIN(sqstr); token = "\""; }
@@ -110,6 +110,6 @@ BADESC          \\([^0-9]|{DIGIT}+)
 {IDENTIFIER}        { __RETURN_VAL(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
-<*>\n              { __NEWLINE; } 
+<*>\n               { token += "\n"; __NEWLINE; } 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

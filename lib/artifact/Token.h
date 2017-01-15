@@ -5,12 +5,11 @@
 #define __TUPIN_TOKEN__ 1
 
 class Token : public Pos
-{
-  protected:
+{ 
+  public:
     int type;
     std::string val;
 
-  public:
     Token(int _type = 0,
           int _line = -1,
           int _col = -1,
@@ -24,10 +23,28 @@ class Token : public Pos
     {
         return val.data();
     }
-
-    friend std::ostream &operator<<(std::ostream &o, const Token &t)
+ 
+    Token& operator = (const std::string& s)
     {
-        return o << t.line << ":" << t.col << ": " << t.val;
+        val = s;
+        return *this;
+    }
+
+    std::string tab(int siz = 4)
+    {
+        std::string nval = "";
+        for(char ch : val)
+        {
+            nval.push_back(ch);
+            if(ch == '\n')
+            {
+                for(int i = 0; i < siz; ++i)
+                {
+                    nval.push_back(' ');
+                }
+            }
+        }    
+        return nval; 
     }
 };
 

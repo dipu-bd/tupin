@@ -39,7 +39,7 @@ int retToken(int type, const char *str)
     printf("%s\n", token.data());
 #endif
  
-    yylval = Token(type, line, column, token.data());
+    yylval = token;
     return type;
 }
 

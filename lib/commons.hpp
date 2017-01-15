@@ -2,8 +2,8 @@
 #include "artifacts.h"
 #include "FileSystem.h"
 
-#define YYDEBUG 1
-#define YYSTYPE Token
+//#define YYDEBUG 1
+#define YYSTYPE std::string
 
 int yylex (void);
 int yyparse(void);

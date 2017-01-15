@@ -2,188 +2,214 @@
     #include "commons.hpp"    
     #include "ParserHelper.hpp"    
 %}
-
+ 
 %verbose 
  
 %token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID 
-%token AND OR NOT XOR
-%token EQ NEQ LEQ GEQ
-%token OP PWR PWREQ THREEDOT
+%token OP PWR OPEQ PWREQ THREEDOT
 
 %%
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Block 
-    | Program Function
-    |   /* NULL */
+Program: Header     { 
+                cout << "#include \"tupin.hpp\"\n" 
+                     << "using namespace std;\n"
+                     << "using namespace tupin;\n"
+                     << "\n"
+                     << $1
+                     << "\n"
+                     << "\nint main() {\n"
+                     << tab("return 0;")
+                     << "\n}\n\n"; 
+                /*"*/ }
+    ;
+    
+Header: Header Block       { $$ = $1 + "\n{\n" + tab($2) + "\n}"; /*"*/}
+    | Header Function      { $$ = $1 + "\n" + $2; }
+    | /* empty program */  { $$ = ""; }
     ;
 
     /*---------------------------------_ 
      |       Functoin Definition        |
      *----------------------------------*/    
-Function: DEF ID '(' Arguments ')' '{' Block '}'
+Function: DEF ID '(' Arguments ')' '{' Block '}'  {
+                   $$ = "template <typename T>\n"; 
+                   $$ += "T " + $2 + "(" + $4 + ") {\n"; 
+                   $$ += tab($7) + "\n}"; } /* " */
     ; 
 
 Arguments:  /* can be empty */
-    | ArgVarList 
+    | ArgVarList { $$ = $1; } 
     ;
 
-ArgVarList: ID
-    | ArgVarList ',' ID
+ArgVarList: ArgDef  { $$ = $1; }
+    | ArgVarList ',' ArgDef { $$ = $1 + ", " + $3; }
     ; 
+
+ArgDef: ID  { $$ = "auto " + $1; }
+    ;
     
     /*---------------------------------_ 
      |        Block's Definition        |
      *----------------------------------*/     
-Block : Loop
-    | Condition
-    | Statement 
+Block : Loop        { $$ = $1; }
+    | Condition     { $$ = $1; }
+    | Statement     { $$ = $1; }
     ;
 
-Statement: SingleStmnt ';' 
-    | '{' Block '}'
+Statement: SingleStmnt ';'  { $$ = $1 + ";"; }
+    | '{' Block '}'         { $$ = "{\n" + tab($2) + "\n}"; } /*"*/
     ;
 
-SingleStmnt: Declaration
-    | PrintStmnt
-    | Expression
+SingleStmnt: Declaration    { $$ = $1; }
+    | PrintStmnt            { $$ = $1; }
+    | Expression            { $$ = $1; }
     ;
 
     /*---------------------------------_ 
      |         Print Statement          |
      *----------------------------------*/    
-PrintStmnt: '[' PrintSequence ']'
+PrintStmnt: '[' PrintSequence ']'   { $$ = "cout << " + $2; }
     ;
 
 PrintSequence: 
-      PrintSequence STRING
-    | PrintSequence Expression
-    | STRING
-    | Expression
-    |   /* can be empty */
+      PrintSequence STRING      { $$ = $1 + " << " + $2; }
+    | PrintSequence Expression  { $$ = $1 + " << (" + $2 + ")"; }
+    | STRING                    { $$ = $1; }
+    | Expression                { $$ = $1; }
+    |  /* can be empty */       { $$ = ""; }  
     ;
 
     /*---------------------------------_ 
      |            Conditions            |
      *----------------------------------*/         
-Condition: IF '(' Boolean ')' Block Branch
-    | IF '[' ID ']' '{' Switch '}' 
+Condition: IF ConditionStmnt { $$ = "if " + $2; }
+    | IF '[' ID ']' '{' Switch '}'  {$$ = "switch (" + $3 + ") {\n" + tab($6) + "\n}" /*"*/ } 
     ;
 
-Branch: ELIF '(' Boolean ')' Block Branch
-    | ELSE Block
+ConditionStmnt: 
+        '(' Expression ')' SingleStmnt ';' Branch   
+                { $$ = "(" + $2 + ")\n" + tab($4) + ";\n" + $6; }  
+        | '(' Expression ')' '{' Block '}' Branch   
+                { $$ = "(" + $2 + ") {\n" + tab($5) + "\n}\n" + $7; /*"*/ } 
+
+Branch: ELIF ConditionStmnt { $$ = "else if " + $2; }
+    | ELSE SingleStmnt ';' { $$ = "else " + tab($2) + ";"; }
+    | ELSE '{' Block '}' { $$ = "else {\n" + tab($3, 2) + "\n}"; /*"*/ }
     | /* can be empty */
     ;
 
-Switch: Choice
-    | Switch ',' Choice
+Switch: Choice          { $$ = $1; } 
+    | Switch Choice     { $$ = $1 + "\n" + $2; }
     ;
 
-Choice: Literal ':' '{' Block '}' 
+Choice: Choice ','      { $$ = $1 + "\n" + tab("break;"); }
+    | Literal ':' '{' Block '}'     { $$ = "case " + $1 + ":\n" + tab($4,2); }
     ;
 
     /*---------------------------------_ 
      |              Looping             |
      *----------------------------------*/    
-Loop: FOR '(' Expression ')' '{' Block '}'
+Loop: FOR '(' Expression ')' '{' Block '}'      
+            { $$ = "while (" + $3 + ") {\n" + tab($6) + "\n}"; /*"*/ }
     | FOR '(' Declaration ';' Expression ';' Expression ')' '{' Block '}'
+            { $$ = "for (" + $3 + "; " + $5 + "; " + $7 + ") {\n" + tab($10) + "\n}"; /*"*/ }
     | FOR '[' LoopIterator ']' '{' Block '}'
+            { $$ = "for (auto __i : " + $3 + ") {\n" + tab($6) + "\n}"; /*"*/ }
     | FOR '[' ID ':' LoopIterator ']' '{' Block '}'
+            { $$ = "for (auto " + $3 + " : " + $5 + ") {\n" + tab($8) + "\n}"; /*"*/ }
     ;
 
 LoopIterator: 
-    | Literal TO Literal
-    | Literal TO Literal BY Literal
-    | Expression
+    | Literal TO Literal                { $$ = "tupin::range(" + $1 + ", " + $3 +")"; }
+    | Literal TO Literal BY Literal     { $$ = "tupin::range(" + $1 + ", " + $3 + ", " + $5 +")"; }
+    | Expression                        { $$ = "(" + $1 + ")"; }
     ;
 
     /*---------------------------------_ 
      |         Function Call            |
      *----------------------------------*/    
-FunctionCall: ID '(' ParamList ')'
+FunctionCall: ID '(' ParamList ')'      { $$ = $1 + "(" +  $3 + ")"; }
     ;
 
-ParamList: Params 
-    |    /* can be empty */
+ParamList: Params               { $$ = $1; }
+    |    /* can be empty */     { $$ = ""; }
     ;
 
-Params: Expression
-    | Params ',' Expression
+Params: Expression              { $$ = $1; }
+    | Params ',' Expression     { $$ = $1 + ", " + $3; }
     ;
 
     /*---------------------------------_ 
      |       Variable  and Array        |
      *----------------------------------*/    
 
-Declaration: ID '=' Expression
-    | ID '=' ArrayDef
+Declaration: ID '=' Expression      { $$ = "auto " + $1 + " = " + $3; }
+    | ID '=' ArrayDef               { $$ = "auto " + $1 + " = " + $3; }
     ; 
- 
-ArrayDef: '{' ParamList '}'
+
+ArrayDef: '{' ParamList '}'         { $$ = "Array(" + $2 + ")"; }
     ;
     
-ArrayUsage: ID '[' Expression ']'
+ArrayUsage: ID IndexList   { $$ = $1 + $2; }
+    ;
+
+IndexList: '[' CommaIndex ']'       { $$ = $2; }
+    | IndexList '[' CommaIndex ']'  { $$ = $1 + $3; }
+    ;
+
+CommaIndex: Expression          { $$ = "[(" + $1 + ")]"; }
+    | CommaIndex ',' Expression   { $$ = $1 + "[(" + $3 + ")]"; }
+    ;
 
     /*---------------------------------_ 
      |           Expressions            |
      *----------------------------------*/ 
 
-Expression: Expression '+' Term
-    | Expression '-' Term
-    | Term
+Expression: Expression Operator Unary { $$ = $1 + $2 + $3; }    
+    | Expression PWR Unary { $$ = "tupin::power(" + $1 + ", " + $3 + ")"; }  
+    | Unary      { $$ = $1; }
     ;
 
-Term: Term '*' Unary 
-    | Term '/' Unary 
-    | Unary
+Operator: '+'   { $$ = $1; }
+    | '-'   { $$ = $1; }
+    | '*'   { $$ = $1; }
+    | '/'   { $$ = $1; }
+    | '%'   { $$ = $1; }
+    | '|'   { $$ = $1; }
+    | '^'   { $$ = $1; }
+    | '&'   { $$ = $1; }
+    | '<'   { $$ = $1; }
+    | '>'   { $$ = $1; }
+    | OP    { $$ = $1; }
+    
+Unary: '~' Unary { $$ = "~" + $1; }
+    | '-' Unary { $$ = "-" + $1; }
+    | '!' Unary { $$ = "!" + $1; }
+    | Factor { $$ = $1; }
     ;
 
-Unary: '~' Unary 
-    | '-' Unary 
-    | Factor
+Factor: '(' Expression ')'  { $$ = "(" + $2 + ")" ; }
+    | Assignment            { $$ = $1;}
+    | Literal               { $$ = $1; }
+    | ID                    { $$ = $1; }
+    | ArrayUsage            { $$ = $1; }
+    | FunctionCall          { $$ = $1; }
     ;
 
-Factor: '(' Boolean ')' 
-    | Literal 
-    | Location    
+Assignment: ID OPEQ Expression  { $$ = $1 + $2 + $3; }
+    | ID '=' Expression { $$ = $1 + $2 + $3; }
+    | ID PWREQ Expression   { $$ = "tupin::power(" + $1 + ", " + $3 + ")"; }
     ;
  
-Boolean: Boolean OR Join 
-    | Join 
-    ;
-
-Join: Join AND UnaryBoolean
-    | UnaryBoolean 
-    ;
-UnaryBoolean: '!' Equality 
-    | Equality  
-    ;
-
-Equality: Equality EQ Relation
-    | Equality NEQ Relation
-    | Relation 
-    ;
-
-Relation: Expression '<' Expression
-    | Expression LEQ  Expression 
-    | Expression GEQ Expression
-    | Expression '>' Expression
-    | Expression 
-    ;
-
-Location: ID        
-    | ArrayUsage
-    | FunctionCall  
-    ;
-    
 Literal: Number { $$ = $1; }
     | STRING    { $$ = $1; }
     ;
 
 Number: INT { $$ = $1; }
-    | FLOAT { }
+    | FLOAT { $$ = $1; }
     ;
 
 %% 

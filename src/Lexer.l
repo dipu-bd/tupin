@@ -70,17 +70,17 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
     /*********** Operators **********/
 "..."               { __RETURN_VAL(THREEDOT); }
-"**="               { __RETURN_VAL(PWREQ); }
-"&&"                { __RETURN_VAL(AND); }
-"||"                { __RETURN_VAL(OR); }
-"=="                { __RETURN_VAL(EQ); }
-"!="                { __RETURN_VAL(NEQ); }
-"<="                { __RETURN_VAL(LEQ); }
-">="                { __RETURN_VAL(GEQ); }
+"**="               { __RETURN_VAL(PWREQ); } 
+{OP_EQ}             { __RETURN_VAL(OPEQ); }
+{OP_DBL}            { __RETURN_VAL(OP); }
 "**"                { __RETURN_VAL(PWR); }
-"<>"                { token="!="; __RETURN(NEQ); }
-{OP_EQ}|{OP_DBL}    { __RETURN_VAL(OP); }
+"<>"                { token="!="; __RETURN(OP); }
 {OP_SNGL}           { __RETURN_VAL(yytext[0]); }
+
+"and"               { token="&&"; __RETURN(OP); }
+"or"                { token="||";__RETURN(OP); }
+"not"               { __RETURN_VAL('!'); }
+"xor"               { __RETURN_VAL('^'); }
 
 
     /*********** Numbers **********/    
@@ -94,20 +94,17 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
     /*********** Keywords **********/
 "true"|"false"      { token = toNumber(yytext + 2, 2); __RETURN(INT); }
-"def"               { __RETURN(DEF); }
-"return"            { __RETURN(RETURN); }
-"if"                { __RETURN(IF); }
-"elif"              { __RETURN(ELIF); }
-"else"              { __RETURN(ELSE); }
-"for"               { __RETURN(FOR); }
-"continue"          { __RETURN(CONTINUE); }
-"break"             { __RETURN(BREAK); }
-"and"               { __RETURN(AND); }
-"or"                { __RETURN(OR); }
-"not"               { __RETURN(NOT); }
-"xor"               { __RETURN(XOR); }
-"to"                { __RETURN(TO); }
-"by"                { __RETURN(BY); } 
+"def"               { __RETURN_VAL(DEF); }
+"if"                { __RETURN_VAL(IF); }
+"elif"              { __RETURN_VAL(ELIF); }
+"else"              { __RETURN_VAL(ELSE); }
+"for"               { __RETURN_VAL(FOR); }
+"to"                { __RETURN_VAL(TO); }
+"by"                { __RETURN_VAL(BY); } 
+
+"return"            { __RETURN_VAL(RETURN); }
+"continue"          { __RETURN_VAL(CONTINUE); }
+"break"             { __RETURN_VAL(BREAK); }
 
     /*********** Identifier **********/
 {IDENTIFIER}        { __RETURN_VAL(ID); }

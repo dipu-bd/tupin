@@ -29,4 +29,5 @@
 *.app
 
 # Builds
-.build/ 
+.build/
+.vscode/

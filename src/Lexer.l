@@ -57,16 +57,16 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "//"[^\n]*          /* eat up single line comment */
 
     /*********** Strings **********/ 
-<INITIAL>"\'"       { BEGIN(sqstr); token.val = "\""; }
-<INITIAL>"\""       { BEGIN(dqstr); token.val = yytext; }
+<INITIAL>"\'"       { BEGIN(sqstr); token = "\""; }
+<INITIAL>"\""       { BEGIN(dqstr); token = yytext; }
 <sqstr,dqstr>{
-    {ESCAPE}        { token.val += yytext; }
-    {BADESC}        { token.val += (yytext + 1);
+    {ESCAPE}        { token += yytext; }
+    {BADESC}        { token += (yytext + 1);
                       __ERROR("Unrecognized escape sequence"); }    
 }
-<sqstr>[^\\']*      { token.val += yytext; }
-<sqstr>\'           { BEGIN(INITIAL); token.val += "\"";  __RETURN(STRING);  }
-<dqstr>[^\\"]*\"    { BEGIN(INITIAL); token.val += yytext; __RETURN(STRING); } 
+<sqstr>[^\\']*      { token += yytext; }
+<sqstr>\'           { BEGIN(INITIAL); token += "\"";  __RETURN(STRING);  }
+<dqstr>[^\\"]*\"    { BEGIN(INITIAL); token += yytext; __RETURN(STRING); } 
 
     /*********** Operators **********/
 "..."               { __RETURN_VAL(THREEDOT); }
@@ -78,22 +78,22 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "<="                { __RETURN_VAL(LEQ); }
 ">="                { __RETURN_VAL(GEQ); }
 "**"                { __RETURN_VAL(PWR); }
-"<>"                { token.val="!="; __RETURN(NEQ); }
+"<>"                { token="!="; __RETURN(NEQ); }
 {OP_EQ}|{OP_DBL}    { __RETURN_VAL(OP); }
 {OP_SNGL}           { __RETURN_VAL(yytext[0]); }
 
 
     /*********** Numbers **********/    
-{BIN}               { token.val = toNumber(yytext + 2, 2); __RETURN(INT); }
-{OCTA}              { token.val = toNumber(yytext + 2, 8); __RETURN(INT); }      
-{HEXA}              { token.val = toNumber(yytext + 2, 16); __RETURN(INT); }   
-{EFLOAT}            { token.val = toNumber(yytext, 0); __RETURN(FLOAT); }       
-{FLOAT}             { token.val = toNumber(yytext, 0); __RETURN(FLOAT); }      
-{INT}               { token.val = toNumber(yytext, 10); __RETURN(INT);  } 
+{BIN}               { token = toNumber(yytext + 2, 2); __RETURN(INT); }
+{OCTA}              { token = toNumber(yytext + 2, 8); __RETURN(INT); }      
+{HEXA}              { token = toNumber(yytext + 2, 16); __RETURN(INT); }   
+{EFLOAT}            { token = toNumber(yytext, 0); __RETURN(FLOAT); }       
+{FLOAT}             { token = toNumber(yytext, 0); __RETURN(FLOAT); }      
+{INT}               { token = toNumber(yytext, 10); __RETURN(INT);  } 
 {INVALID_NUMBER}    { __ERROR("Invalid number"); }
 
     /*********** Keywords **********/
-"true"|"false"      { token.val = toNumber(yytext + 2, 2); __RETURN(INT); }
+"true"|"false"      { token = toNumber(yytext + 2, 2); __RETURN(INT); }
 "def"               { __RETURN(DEF); }
 "return"            { __RETURN(RETURN); }
 "if"                { __RETURN(IF); }

@@ -1,6 +1,6 @@
 /*
  * Auto generated artifact file
- * Sun Jan 15 16:45:25 BDT 2017
+ * Sun Jan 15 17:30:53 BDT 2017
  */
 
 // -- artifact/controls/condition -- 
@@ -43,5 +43,4 @@
 #include "artifact/Pos.h"
 #include "artifact/Program.h"
 #include "artifact/Token.h"
-#include "artifact/YYToken.h"
 

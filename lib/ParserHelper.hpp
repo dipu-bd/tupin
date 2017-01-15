@@ -1,6 +1,8 @@
 using namespace std;
 
+extern string token;
 extern FileSystem env;
+extern int line, column;
 extern FILE *yyin, *yyout;
 
 /* Function definitions for parser*/
@@ -39,7 +41,7 @@ void yyerror(const char *msg, int line, int col, const char *file = "")
 
 void yyerror(const char *msg)
 {
-    yyerror(msg, -1, -1);
+    yyerror(msg, line, column, env.sourceFile().data());
 }
 
 std::string tab(std::string val, int siz = 4)

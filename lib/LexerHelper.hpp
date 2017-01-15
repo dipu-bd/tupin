@@ -1,12 +1,16 @@
 using namespace std;
 
 /* Predefined actions */
-#define __NEWLINE newLine(); // printf("\n%3d. ", yylineno);
-#define __INITIALIZE         // printf("%3d. ", yylineno);
+#define __INITIALIZE // printf("%3d. ", yylineno);
+#define __ERROR(x) yyerror(x)
 
-#define __ERROR(x) yyerror(x, line, column, env.sourceFile().data());
+#define __NEWLINE    \
+    line = yylineno; \
+    column = 0; // printf("\n%3d. ", yylineno);
 
-#define YY_USER_ACTION updateColumn(yyleng);
+#define YY_USER_ACTION \
+    line = yylineno;   \
+    column += yyleng;
 
 #define __RETURN(x) return retToken(x, #x);
 #define __RETURN_VAL(x) \
@@ -19,17 +23,6 @@ int line = 0;
 int column = 0;
 FileSystem env;
 
-void newLine()
-{
-    line++;
-    column = 0;
-}
-
-void updateColumn(int len)
-{
-    column += len;
-}
-
 /* Debuggin and token returns */
 int retToken(int type, const char *str)
 {
@@ -38,7 +31,7 @@ int retToken(int type, const char *str)
     printf("%d:%d:%s ", line, column, str);
     printf("%s\n", token.data());
 #endif
- 
+
     yylval = token;
     return type;
 }

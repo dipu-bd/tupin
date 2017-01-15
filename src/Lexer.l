@@ -49,12 +49,12 @@ BADESC          \\([^0-9]|{DIGIT}+)
     /*********** Comments **********/
 <INITIAL>"/*"       { /*"*/ BEGIN(comment); token = yytext; }
 <comment>{
-    [^*\n]*         { token += yytext; }
-    "*"+[^*/\n]*    { token += yytext; }
-    \n              { token += "\n"; REJECT; } 
-    "*/"            { BEGIN(INITIAL); token += yytext; __RETURN(COMMENT); }
+\n                  { token += "\n"; REJECT; } 
+[^*\n]*             { token += yytext; }
+"*"+[^*/\n]*        { token += yytext; }
+"*/"                { BEGIN(INITIAL); token += yytext; /*__RETURN(COMMENT); */ }
 }
-<INITIAL>"//"[^\n]*          { token = yytext; }
+<INITIAL>"//"[^\n]* { token += yytext; /*__RETURN(COMMENT); */}
 
     /*********** Strings **********/ 
 <INITIAL>"\'"       { BEGIN(sqstr); token = "\""; }

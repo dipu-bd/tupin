@@ -46,13 +46,14 @@ ArgVarList: ArgVarList ',' ID { $$ = $1 + "\n" + $3; }
     /*---------------------------------_ 
      |        Block's Definition        |
      *----------------------------------*/     
-Block: Loop        { $$ = $1; }
+Block: Loop         { $$ = $1; }
     | Condition     { $$ = $1; }
     | Statement     { $$ = $1; } 
+    | Block Block   { $$ = $1 + "\n" + $2; }
     ;
 
 Statement: SingleStmnt ';'  { $$ = $1 + ";"; }
-    | '{' Block '}'         { $$ = "{\n" + tab($2) + "\n}"; } /*"*/
+    | '{' Block '}'         { $$ = "{\n" + tab($2) + "\n}"; } /*"*/ 
     ;
 
 SingleStmnt: Declaration    { $$ = $1; }
@@ -60,7 +61,7 @@ SingleStmnt: Declaration    { $$ = $1; }
     | Expression            { $$ = $1; }     
     | RETURN Expression     { $$ = $1 + $2; }
     | CONTINUE              { $$ = $1; }
-    | BREAK                 { $$ = $1; }
+    | BREAK                 { $$ = $1; } 
     ;
 
     /*---------------------------------_ 

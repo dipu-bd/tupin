@@ -12,7 +12,7 @@ def main() {
       ' '
       m = rand(0, 16000)
     ];        
-    for i range(m-1) {  // index variable i is local to this scope only.
+    for i : range(m-1) {  // index variable i is local to this scope only.
       /* 
        Generates a random pair
       */ 

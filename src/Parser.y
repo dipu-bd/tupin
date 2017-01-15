@@ -1,11 +1,11 @@
 %{ 
-    #include "commons.hpp"    
+    #include "commons.hpp"     
     #include "ParserHelper.hpp"    
 %}
- 
+
 %verbose 
  
-%token DEF RETURN IF ELIF ELSE FOR CONTINUE BREAK TO BY
+%token DEF IF ELIF ELSE FOR RETURN CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID COMMENT
 %token OP PWR OPEQ PWREQ THREEDOT
 
@@ -16,49 +16,45 @@
 Program: Combined     { saveProgram($1); }
     ;
     
-Combined: Combined Block    { $$ = $1 + "\n{\n" + tab($2) + "\n}"; /*"*/}
-    | Combined Function     { $$ = $1 + "\n" + $2; }
-    | Combined COMMENT      { $$ = $1 + $2; }
+Combined: Combined Block    { $$ = $1 + "\n{\n" + tab($2) + "\n}\n"; /*"*/}
+    | Combined Function     { $$ = $1 + "\n" + $2 + "\n"; } 
     | /* empty program */   { $$ = ""; }
     ;
 
     /*---------------------------------_ 
      |       Functoin Definition        |
      *----------------------------------*/    
-Function: DEF ID '(' Arguments ')' '{' Block '}'  {
-                        $$ = "template <typename T>\n"; 
-                        $$ += "T " + $2 + "(" + $4 + ") {\n"; 
-                        $$ += tab($7) + "\n}";/*"*/ 
-                    } 
+Function: DEF ID '(' Arguments ')' '{' Block '}'  { $$ = defFunction($2, $4, $7); }
     ; 
 
-Arguments: { $$ = ""; } /* can be empty */ 
-    | ArgVarList { $$ = $1; } 
+Arguments: ArgVarList { $$ = $1; } 
+    | { $$ = ""; } /* can be empty */     
     ;
 
-ArgVarList: ArgDef  { $$ = $1; }
-    | ArgVarList ',' ArgDef { $$ = $1 + ", " + $3; }
+ArgVarList: ArgVarList ',' ID { $$ = $1 + "\n" + $3; }
+    | ID  { $$ = $1; }
     ; 
-
-ArgDef: ID  { $$ = "auto " + $1; }
-    ;
     
     /*---------------------------------_ 
      |        Block's Definition        |
      *----------------------------------*/     
 Block : Loop        { $$ = $1; }
     | Condition     { $$ = $1; }
-    | Statement     { $$ = $1; }
+    | Statement     { $$ = $1; } 
     | Block Block   { $$ = $1 + "\n" + $2; }
     ;
 
 Statement: SingleStmnt ';'  { $$ = $1 + ";"; }
     | '{' Block '}'         { $$ = "{\n" + tab($2) + "\n}"; } /*"*/
+    | COMMENT               { $$ = $1; }
     ;
 
 SingleStmnt: Declaration    { $$ = $1; }
     | PrintStmnt            { $$ = $1; }
-    | Expression            { $$ = $1; }
+    | Expression            { $$ = $1; }     
+    | RETURN Expression     { $$ =  $1 + $2; }
+    | CONTINUE              { $$ = $1; }
+    | BREAK                 { $$ = $1; }
     ;
 
     /*---------------------------------_ 
@@ -67,8 +63,7 @@ SingleStmnt: Declaration    { $$ = $1; }
 PrintStmnt: '[' PrintSequence ']'   { $$ = "cout << " + $2; }
     ;
 
-PrintSequence: 
-      PrintSequence STRING      { $$ = $1 + " << " + $2; }
+PrintSequence: PrintSequence STRING      { $$ = $1 + " << " + $2; }
     | PrintSequence Expression  { $$ = $1 + " << (" + $2 + ")"; }
     | STRING                    { $$ = $1; }
     | Expression                { $$ = $1; }
@@ -115,8 +110,7 @@ Loop: FOR '(' Expression ')' '{' Block '}'
             { $$ = "for (auto " + $2 + " : " + $4 + ") {\n" + tab($6) + "\n}"; /*"*/ }
     ;
 
-LoopIterator: 
-    | Literal TO Literal                { $$ = "range(" + $1 + ", " + $3 +")"; }
+LoopIterator: Literal TO Literal                { $$ = "range(" + $1 + ", " + $3 +")"; }
     | Literal TO Literal BY Literal     { $$ = "range(" + $1 + ", " + $3 + ", " + $5 +")"; }
     | Expression                        { $$ = "(" + $1 + ")"; }
     ;

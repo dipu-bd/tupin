@@ -17,7 +17,7 @@ SPACE           [ \t\r\v\f]
 DIGIT           [0-9] 
 XDIGIT          [A-Fa-f0-9]
     /* Identifier */
-IDENTIFIER      [_$A-Za-z]([_$A-Za-z0-9])*
+ID              [_$A-Za-z]([_$A-Za-z0-9])*
     /* Number system */
 INT             {DIGIT}+
 FLOAT           {INT}"."{DIGIT}*  
@@ -45,16 +45,17 @@ BADESC          \\([^0-9]|{DIGIT}+)
     __INITIALIZE;
     
     /*********** Whitespaces **********/
-{SPACE}		        /* skip whitespace */
+<INITIAL>{SPACE}		        /* skip whitespace */
 
     /*********** Comments **********/
 <INITIAL>"/*"       { /*"*/ BEGIN(comment); token = yytext; }
 <comment>{
     [^*\n]*         { token += yytext; }
     "*"+[^*/\n]*    { token += yytext; }
+    \n              { token += "\n"; REJECT; } 
     "*/"            { BEGIN(INITIAL); token += yytext; __RETURN(COMMENT); }
 }
-"//"[^\n]*          { token = yytext; __RETURN(COMMENT); }
+<INITIAL>"//"[^\n]*          { token = yytext; }
 
     /*********** Strings **********/ 
 <INITIAL>"\'"       { BEGIN(sqstr); token = "\""; }
@@ -69,6 +70,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 <dqstr>[^\\"]*\"    { BEGIN(INITIAL); token += yytext; __RETURN(STRING); } 
 
     /*********** Operators **********/
+<INITIAL>{
 "..."               { __RETURN_VAL(THREEDOT); }
 "**="               { __RETURN_VAL(PWREQ); } 
 {OP_EQ}             { __RETURN_VAL(OPEQ); }
@@ -81,9 +83,10 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "or"                { token="||";__RETURN(OP); }
 "not"               { __RETURN_VAL('!'); }
 "xor"               { __RETURN_VAL('^'); }
-
+}
 
     /*********** Numbers **********/    
+<INITIAL>{
 {BIN}               { token = toNumber(yytext + 2, 2); __RETURN(INT); }
 {OCTA}              { token = toNumber(yytext + 2, 8); __RETURN(INT); }      
 {HEXA}              { token = toNumber(yytext + 2, 16); __RETURN(INT); }   
@@ -91,8 +94,10 @@ BADESC          \\([^0-9]|{DIGIT}+)
 {FLOAT}             { token = toNumber(yytext, 0); __RETURN(FLOAT); }      
 {INT}               { token = toNumber(yytext, 10); __RETURN(INT);  } 
 {INVALID_NUMBER}    { __ERROR("Invalid number"); }
+}
 
     /*********** Keywords **********/
+<INITIAL>{
 "true"|"false"      { token = toNumber(yytext + 2, 2); __RETURN(INT); }
 "def"               { __RETURN_VAL(DEF); }
 "if"                { __RETURN_VAL(IF); }
@@ -105,11 +110,13 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "return"            { __RETURN_VAL(RETURN); }
 "continue"          { __RETURN_VAL(CONTINUE); }
 "break"             { __RETURN_VAL(BREAK); }
+}
 
     /*********** Identifier **********/
-{IDENTIFIER}        { __RETURN_VAL(ID); }
+<INITIAL>{ID}       { __RETURN_VAL(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
-<*>\n               { token += "\n"; __NEWLINE; } 
+
+<*>\n               { __NEWLINE; } 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

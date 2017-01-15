@@ -60,6 +60,38 @@ std::string tab(std::string val, int siz = 4)
     return nval;
 }
 
+string defFunction(string name, string args, string block)
+{ 
+    string retType = "__RET__";
+    string argType = "__ARG";
+
+    int cnt = 0;
+    string arglist = "";
+    string tmp = "typename " + retType;
+
+    char delim = '\n';
+    while (args.size())
+    {
+        size_t pos = args.find(delim);
+        string arg = args;
+        if (pos > 0)
+        {
+            arg = args.substr(0, pos);
+            args = args.substr(pos + 1);
+        }
+        cnt++;
+        string type = argType + to_string(cnt);
+        tmp += ", typename " + type;
+        if (cnt > 1) arglist += ", ";
+        arglist += type + " " + arg;
+    }
+
+    string func = "template <" + tmp + "> \n";
+    func += retType + " " + name + "(" + arglist + ") {\n";
+    func += tab(block) + "\n}";
+    return func;
+}
+
 void saveProgram(string val)
 {
     string out = "#include \"tupin.hpp\"\n";

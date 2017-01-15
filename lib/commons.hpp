@@ -2,7 +2,7 @@
 #include "Token.h"
 #include "FileSystem.h"
 
-#define YYDEBUG 1
+//#define YYDEBUG 1
 #define YYSTYPE std::string
 
 int yylex (void);

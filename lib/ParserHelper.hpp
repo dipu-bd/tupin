@@ -10,11 +10,11 @@ void init(int argc, char **argv)
 
     if (argc > 1 && argv[1])
     {
-        freopen(argv[1], "r", stdin);
+        yyin = fopen(argv[1], "r");
     }
     if (argc > 2 && argv[2])
     {
-        freopen(argv[2], "w", stdout);
+        yyout = fopen(argv[2], "w");
     }
 }
 
@@ -62,13 +62,14 @@ std::string tab(std::string val, int siz = 4)
 
 void saveProgram(string val)
 {
-    cout << "#include \"tupin.hpp\"\n"
-         << "using namespace std;\n"
-         << "using namespace tupin;\n"
-         << "\n"
-         << val
-         << "\n"
-         << "\nint main() {\n"
-         << tab("return 0;")
-         << "\n}\n\n";
+    string out = "#include \"tupin.hpp\"\n";
+    out += "using namespace std;\n";
+    out += "using namespace tupin;\n";
+    out += "\n";
+    out += val;
+    out += "\n";
+    out += "\nint main() {\n";
+    out += tab("return 0;");
+    out += "\n}\n";
+    fprintf(yyout, "%s", out.data());
 }

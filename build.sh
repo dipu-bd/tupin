@@ -7,6 +7,7 @@ BUILD_PATH=".build"
 SOURCE_PATH="src"
 LIB_PATH="lib"
 TEST_PATH="test" 
+SAMPLE_CODE="sample/code"
 ARTIFACT_FOLDER="lib/artifact"
 
 INPUT_FILE=""
@@ -88,7 +89,30 @@ function run
 }
 
 function test 
-{ 
+{       
+    test="$BUILD_PATH/test"
+    echo "Test output folder: $test"  
+    mkdir $test
+
+    # all .tpn files
+    echo "Starting test..."
+    for file in $SAMPLE_CODE/*.tpn ; do  
+        if [ -f $file ]; then   
+            echo "-----------------------------------------"         
+            echo "Running $file..."
+            out=${file##*/}
+            out="$test/${out%.*}.cpp"   
+            ./$PROGRAM_FILE $file $out            
+        fi
+    done    
+
+    echo "-----------------------------------------"         
+    echo "ALL TESTS COMPLETED."
+    exit
+}
+
+function OLD_TEST 
+{
     echo "Copying test libraries..."
     cp -a "$TEST_PATH/." "$BUILD_PATH"
 
@@ -182,8 +206,9 @@ done
 # RUN TASKS AT LAST
 #buildArtifacts
 compile
-if [ $RUN_TASK == 1 ]; then 
-    run
-elif [ $TEST_TASK == 1 ]; then 
+if [ $TEST_TASK == 1 ]; then 
     test
 fi 
+if [ $RUN_TASK == 1 ]; then 
+    run
+fi

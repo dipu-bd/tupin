@@ -49,7 +49,6 @@ BADESC          \\([^0-9]|{DIGIT}+)
     /*********** Comments **********/
 <INITIAL>"/*"       { /*"*/ BEGIN(comment); token = yytext; }
 <comment>{
-\n                  { token += "\n"; REJECT; } 
 [^*\n]*             { token += yytext; }
 "*"+[^*/\n]*        { token += yytext; }
 "*/"                { BEGIN(INITIAL); token += yytext; /*__RETURN(COMMENT); */ }

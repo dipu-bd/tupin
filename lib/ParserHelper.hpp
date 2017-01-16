@@ -63,7 +63,7 @@ std::string tab(std::string val, int siz = 4)
 }
 
 string defFunction(string name, string args, string block)
-{ 
+{  
     string retType = "__RET__";
     string argType = "__ARG";
 
@@ -74,18 +74,23 @@ string defFunction(string name, string args, string block)
     char delim = '\n';
     while (args.size())
     {
-        size_t pos = args.find(delim);
         string arg = args;
-        if (pos > 0)
+        size_t pos = args.find(delim);
+        if (pos > 0 && pos < arg.size())
         {
             arg = args.substr(0, pos);
             args = args.substr(pos + 1);
         }
+        else 
+        {
+            args = "";
+        }
+        
         cnt++;
         string type = argType + to_string(cnt);
         tmp += ", typename " + type;
         if (cnt > 1) arglist += ", ";
-        arglist += type + " " + arg;
+        arglist += type + " " + arg; 
     }
 
     string func = "template <" + tmp + "> \n";

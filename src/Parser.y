@@ -3,130 +3,63 @@
     #include "ParserHelper.hpp"    
 %}
 
-%verbose 
+%verbose  
  
 %token DEF IF ELIF ELSE FOR RETURN CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID COMMENT
 %token OP PWR OPEQ PWREQ THREEDOT
-
-%right '=' 
-%right OPEQ PWREQ
-%left '<' '>'  
-%left OP '&' '^' '|'
-%left '+' '-' '*' '/' '%'
-%left PWR
+ 
+%right "=" OPEQ PWREQ '~' '!' 
+%left OP '<' '>' '&' '^' '|' '+' '-' '*' '/'  '%' PWR
 
 %%
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Combined     { saveProgram($1); }
+Program: Whole     { saveProgram($1); }
     ;
     
-Combined: Combined Block    { $$ = $1 + "\n" + $2 + "\n"; }  
-    | Combined Function     { $$ = $1 + "\n" + $2 + "\n"; }  
-    | Combined CmpndStmnt   { $$ = $1 + "\n{\n" + tab($2) + "\n}\n"; /*"*/}
+Whole: Whole Function  { $$ = $1 + "\n" + $2 + "\n"; }  
+    | Whole Blocks     { $$ = $1 + "\n{\n" + tab($2) + "\n}\n"; /*"*/}
     | /* empty program */   { $$ = ""; }
     ;
 
     /*---------------------------------_ 
-     |       Functoin Definition        |
-     *----------------------------------*/    
-Function: DEF ID '(' Arguments ')' Block  { $$ = defFunction($2, $4, $6); }
-    ; 
-
-Arguments: ArgVarList { $$ = $1; } 
-    | { $$ = ""; } /* can be empty */     
-    ;
-
-ArgVarList: ArgVarList ',' ID { $$ = $1 + "\n" + $3; }
-    | ID  { $$ = $1; }
-    ; 
-    
-    /*---------------------------------_ 
      |        Block's Definition        |
      *----------------------------------*/     
 
-Block: '{' CmpndStmnt '}'  { $$ = "{\n" + tab($2) + "\n}"; } /*"*/ 
-    | '{' '}'              { $$ = "" } /* empty block */ 
+Blocks: Blocks SingleBlock { $$ = $1 + "\n" + $2; }
+    | { $$ = ""; }
     ;
 
-CmpndStmnt: CmpndStmnt SingleStmnt    { $$ = $1 + "\n" + $2; }
-    | CmpndStmnt Block          { $$ = $1 + "\n" + $2; }
-    | Block               { $$ = $1; }
-    | SingleStmnt               { $$ = $1; }
+SingleBlock: Loop       { $$ = $1; }
+    | Condition         { $$ = $1; }
+    | Single ';'        { $$ = $1 + ";" }
+    | '{' Blocks '}'    { $$ = "{\n" + tab($2) + "\n}"; /*"*/ }
     ;
 
-SingleStmnt: Statement ';'  { $$ = $1 + ";" }
-    | Loop                  { $$ = $1; }
-    | Condition             { $$ = $1; } 
-    ;
-
-Statement: Declaration      { $$ = $1; }
-    | PrintStmnt            { $$ = $1; }
-    | Expression            { $$ = $1; }     
-    | RETURN Expression     { $$ = $1 + $2; }
-    | CONTINUE              { $$ = $1; }
-    | BREAK                 { $$ = $1; } 
-    |    /* NULL */         { $$ = ""; }
+Single: Print           { $$ = $1; }
+    | Expression        { $$ = $1; }
+    | Declaration       { $$ = $1; }
+    | BREAK             { $$ = "break"; }
+    | CONTINUE          { $$ = "continue"; }
+    | RETURN Expression { $$ = "return " + $2; }
+    | { $$ = ""; }
     ;
 
     /*---------------------------------_ 
      |         Print Statement          |
      *----------------------------------*/    
-PrintStmnt: '[' PrintSequence ']'   { $$ = "cout << " + $2; }
+Print: '[' PrintSequence ']'   { $$ = "cout << " + $2; }
+    | '[' ']'        {$$ = "cout << \"\\n\""; }
     ;
 
-PrintSequence: PrintSequence STRING      { $$ = $1 + " << " + $2; }
-    | PrintSequence Expression  { $$ = $1 + " << (" + $2 + ")"; }
-    | STRING                    { $$ = $1; }
-    | Expression                { $$ = $1; }
-    |  /* can be empty */       { $$ = ""; }  
+PrintSequence: PrintSequence PrintVar { $$ = $1 + " << " + $2; }
+    | PrintVar { $$ = $1; }
     ;
 
-    /*---------------------------------_ 
-     |            Conditions            |
-     *----------------------------------*/         
-Condition: IF ConditionStmnt { $$ = "if " + $2; }
-    | IF '[' ID ']' '{' Switch '}'  {$$ = "switch (" + $3 + ") {\n" + tab($6) + "\n}" /*"*/ } 
-    ;
-
-ConditionStmnt: 
-        '(' Expression ')' SingleStmnt Branch   
-                { $$ = "(" + $2 + ")\n" + tab($4) + ";\n" + $5; }  
-        | '(' Expression ')' Block Branch   
-                { $$ = "(" + $2 + ") {\n" + $4 + "\n" + $5; } 
-    ;
-
-Branch: ELIF ConditionStmnt { $$ = "else if " + $2; }
-    | ELSE CmpndStmnt { $$ = "else \n" + tab($2); }
-    | /* can be empty */ {$$ = "";}
-    ;
-
-Switch: Choice          { $$ = $1; } 
-    | Switch Choice     { $$ = $1 + "\n" + $2; }
-    ;
-
-Choice: Choice ','          { $$ = $1 + "\n" + tab("break;"); }
-    | Literal ':' Block     { $$ = "case " + $1 + ":\n" + tab($3,2); }
-    ;
-
-    /*---------------------------------_ 
-     |              Looping             |
-     *----------------------------------*/    
-Loop: FOR '(' Expression ')' Block
-            { $$ = "while (" + $3 + ")\n" + $5; }
-    | FOR '(' Declaration ';' Expression ';' Expression ')' Block 
-            { $$ = "for (" + $3 + "; " + $5 + "; " + $7 + ")\n" + $9; }
-    | FOR LoopIterator Block
-            { $$ = "for (auto __i : " + $2 + ")\n" + $3; }
-    | FOR ID ':' LoopIterator Block 
-            { $$ = "for (auto " + $2 + " : " + $4 + ")\n" +$5; }
-    ;
-
-LoopIterator: Literal TO Literal        { $$ = "range(" + $1 + ", " + $3 +")"; }
-    | Literal TO Literal BY Literal     { $$ = "range(" + $1 + ", " + $3 + ", " + $5 +")"; }
-    | Expression                        { $$ = "(" + $1 + ")"; }
+PrintVar: STRING  { $$ = $1; }
+    | Expression  { $$ = "(" + $1 + ")"; }
     ;
 
     /*---------------------------------_ 
@@ -134,11 +67,8 @@ LoopIterator: Literal TO Literal        { $$ = "range(" + $1 + ", " + $3 +")"; }
      *----------------------------------*/    
 
 Declaration: ID '=' Expression      { $$ = "auto " + $1 + " = " + $3; }
-    | ID '=' ArrayDef               { $$ = "auto " + $1 + " = " + $3; }
+    | Declaration ',' Declaration   { $$ = $1 + ";\n" + $2; }
     ; 
-
-ArrayDef: '{' ParamList '}'         { $$ = "Array(" + $2 + ")"; }
-    ;
     
 ArrayUsage: ID '[' CommaIndex ']'             { $$ = $1 + $3; }
     ;
@@ -148,6 +78,45 @@ CommaIndex: Expression              { $$ = "[" + $1 + "]"; }
     ;
 
     /*---------------------------------_ 
+     |            Conditions            |
+     *----------------------------------*/         
+Condition: IF '(' Expression ')' SingleBlock ElseBlock 
+         { $$ = "if (" + $3 + ") " + $5 + $6; }
+    | IF '[' ID ']' '{' CaseBlock '}' 
+         {$$ = "switch (" + $3 + ") {\n" + tab($6) + "\n}"; /*"*/ } 
+    ;
+
+ElseBlock: ELSE SingleBlock { $$ = "\nelse " + $2; }
+    | /* can be empty */ {$$ = "";}
+    ;
+
+CaseBlock: Case CaseBlock { $$ = $1 + "\n" + $2; }  
+    | Case  { $$ = $1; }  
+    ;
+
+Case: Literal ':' Blocks     { $$ = "case " + $1 + ":\n" + tab($3,2); }
+    ;
+
+    /*---------------------------------_ 
+     |              Looping             |
+     *----------------------------------*/    
+Loop: FOR '(' Expression ')' SingleBlock
+        { $$ = "while (" + $3 + ") " + $5; }
+    | FOR '(' Single ';' Expression ';' Single ')' SingleBlock
+        { $$ = "for (" + $3 + "; " + $5 + "; " + $7 + ") " + $9; }    
+    | FOR LoopIterator SingleBlock 
+        { $$ = "for (auto $__index$ : " + $2 + ") " + $3; }
+    | FOR ID ':' LoopIterator SingleBlock 
+            { $$ = "for (auto " + $2 + " : " + $4 + ") " + $5; }
+    ;
+
+LoopIterator: Number TO Number       { $$ = "range(" + $1 + ", " + $3 +")"; }
+    | Number TO Number BY Number     { $$ = "range(" + $1 + ", " + $3 + ", " + $5 +")"; }
+    | Expression                     { $$ = "(" + $1 + ")"; }
+    ;
+
+
+    /*---------------------------------_ 
      |           Expressions            |
      *----------------------------------*/ 
 
@@ -155,7 +124,7 @@ Expression: Expression OP Unary { $$ = $1 + $2 + $3; }
     | Expression PWR Unary { $$ = "power(" + $1 + ", " + $3 + ")"; }  
     | ID OPEQ Expression  { $$ = $1 + $2 + $3; }
     | ID PWREQ Expression   { $$ = $1 + "=power(" + $1 + "," + $3 + ")"; }
-    | ID '=' Expression { $$ = $1 + $2 + $3; }
+    | ID '=' Expression { $$ = $1 + "=" + $3; }
     | Unary      { $$ = $1; }
     ; 
 
@@ -180,6 +149,21 @@ Number: INT { $$ = $1; }
     | FLOAT { $$ = $1; }
     ;
 
+    /*---------------------------------_ 
+     |       Functoin Definition        |
+     *----------------------------------*/    
+Function: DEF ID '(' Arguments ')' '{' Blocks '}' 
+         { $$ = defFunction($2, $4, $7); }
+    ; 
+
+Arguments: ArgList { $$ = $1; } 
+    | { $$ = ""; } /* can be empty */     
+    ;
+
+ArgList: ArgList ',' ID { $$ = $1 + "\n" + $3; }
+    | ID  { $$ = $1; }
+    ; 
+    
     /*---------------------------------_ 
      |         Function Call            |
      *----------------------------------*/    

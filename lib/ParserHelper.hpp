@@ -101,13 +101,13 @@ string defFunction(string name, string args, string block)
 
 void saveProgram(string val)
 {
-    string out = "#include \"tupin.hpp\"\n";
+    string out = "#include <bits/stdc++.h>\n";
     out += "using namespace std;\n";
-    out += "using namespace tupin;\n";
     out += "\n";
+    out += "struct __MAIN__ {";
     out += val;
-    out += "\n";
-    out += "\nint main() {\n";
+    out += "\n} run;\n\n";
+    out += "int main() {\n";
     out += tab("return 0;");
     out += "\n}\n";
     fprintf(yyout, "%s", out.data());

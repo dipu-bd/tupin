@@ -39,8 +39,8 @@ SingleBlock: Loop       { $$ = $1; }
     ;
 
 Single: Print           { $$ = $1; }
-    | Expression        { $$ = $1; }
     | Declaration       { $$ = $1; }
+    | Expression        { $$ = $1; }
     | BREAK             { $$ = "break"; }
     | CONTINUE          { $$ = "continue"; }
     | RETURN Expression { $$ = "return " + $2; }
@@ -66,8 +66,7 @@ PrintVar: STRING  { $$ = $1; }
      |       Variable  and Array        |
      *----------------------------------*/    
 
-Declaration: ID '=' Expression      { $$ = "auto " + $1 + " = " + $3; }
-    | Declaration ',' Declaration   { $$ = $1 + ";\n" + $2; }
+Declaration: ID '=' Expression      { $$ = "auto " + $1 + " = " + $3; } 
     ; 
     
 ArrayUsage: ID '[' CommaIndex ']'             { $$ = $1 + $3; }
@@ -123,8 +122,7 @@ LoopIterator: Number TO Number       { $$ = "range(" + $1 + ", " + $3 +")"; }
 Expression: Expression OP Unary { $$ = $1 + $2 + $3; }    
     | Expression PWR Unary { $$ = "power(" + $1 + ", " + $3 + ")"; }  
     | ID OPEQ Expression  { $$ = $1 + $2 + $3; }
-    | ID PWREQ Expression   { $$ = $1 + "=power(" + $1 + "," + $3 + ")"; }
-    | ID '=' Expression { $$ = $1 + "=" + $3; }
+    | ID PWREQ Expression   { $$ = $1 + "=power(" + $1 + "," + $3 + ")"; } 
     | Unary      { $$ = $1; }
     ; 
 

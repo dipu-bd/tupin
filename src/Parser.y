@@ -7,7 +7,7 @@
 
     string tmp()
     {        
-        return to_string(_t_index++);
+        return "$" + to_string(_t_index++);
     }
     void head(string exp)
     {

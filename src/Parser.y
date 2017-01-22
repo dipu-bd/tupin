@@ -28,7 +28,7 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Assignment ';'        { cout << $2 << endl; }
+Program: Program Assignment ';'        { cout << "OK" << endl; }
     | error
     | 
     ;
@@ -37,18 +37,18 @@ Program: Program Assignment ';'        { cout << $2 << endl; }
      |           Assignment             |
      *----------------------------------*/ 
 
-Assignment: ID '=' Boolean  
-    | ID PWREQ Boolean
-    | ID SHRE Boolean
-    | ID SHLE Boolean
-    | ID MODE Boolean
-    | ID DIVE Boolean
-    | ID MULE Boolean
-    | ID PLSE Boolean
-    | ID MNSE Boolean
-    | ID ANDE Boolean
-    | ID XORE Boolean
-    | ID ORE Boolean
+Assignment: ID '=' Assignment  
+    | ID PWREQ Assignment
+    | ID SHRE Assignment
+    | ID SHLE Assignment
+    | ID MODE Assignment
+    | ID DIVE Assignment
+    | ID MULE Assignment
+    | ID PLSE Assignment
+    | ID MNSE Assignment
+    | ID ANDE Assignment
+    | ID XORE Assignment
+    | ID ORE Assignment
     | Boolean
     ;
  
@@ -105,6 +105,7 @@ Term: '(' Assignment ')'
     | DEC ID
     | ID INC     
     | ID DEC
+    | ID
  /*
     | FunctionCall
     | MemberAccess

@@ -53,76 +53,77 @@ Program: Program Assignment ';'        { cout << _head << "\n" << $2 << "\n" << 
      |           Assignment             |
      *----------------------------------*/ 
 
-Assignment: ID '=' Assignment  
-    | ID PWREQ Assignment
-    | ID SHRE Assignment
-    | ID SHLE Assignment
-    | ID MODE Assignment
-    | ID DIVE Assignment
-    | ID MULE Assignment
-    | ID PLSE Assignment
-    | ID MNSE Assignment
-    | ID ANDE Assignment
-    | ID XORE Assignment
-    | ID ORE Assignment
-    | Boolean
+Assignment: ID '=' Assignment   { $$ = $1; head($1 + "=" + $3); }
+    | ID PWREQ Assignment       { $$ = $1; head($1 + "=power(" + $1 + "," + $3 + ")"); }
+    | ID MODE Assignment        { $$ = $1; head($1 + "=" + $1 + "%" + $3); }
+    | ID DIVE Assignment        { $$ = $1; head($1 + "=" + $1 + "/" + $3); }
+    | ID MULE Assignment        { $$ = $1; head($1 + "=" + $1 + "*" + $3); }
+    | ID PLSE Assignment        { $$ = $1; head($1 + "=" + $1 + "+" + $3); }
+    | ID MNSE Assignment        { $$ = $1; head($1 + "=" + $1 + "-" + $3); }
+    | ID ANDE Assignment        { $$ = $1; head($1 + "=" + $1 + "&" + $3); }
+    | ID XORE Assignment        { $$ = $1; head($1 + "=" + $1 + "^" + $3); }
+    | ID ORE Assignment         { $$ = $1; head($1 + "=" + $1 + "|" + $3); }
+    | ID SHRE Assignment        { $$ = $1; head($1 + "=" + $1 + ">>" + $3); }
+    | ID SHLE Assignment        { $$ = $1; head($1 + "=" + $1 + "<<" + $3); }
+    | Boolean                   { $$ = $1; }
     ;
  
-Boolean: Boolean OR Bits 
-    | Boolean AND Bits
-    | Bits 
+Boolean: Boolean OR Bits    { $$ = tmp(); head($$ + "=" + $1 + "||" + $3); }
+    | Boolean AND Bits      { $$ = tmp(); head($$ + "=" + $1 + "&&" + $3); }
+    | Bits                  { $$ = $1; } 
     ;
 
-Bits: Bits '|' Compare
-    | Bits '&' Compare
-    | Bits '^' Compare
-    | Compare
+Bits: Bits '|' Compare      { $$ = tmp(); head($$ + "=" + $1 + "|" + $3); }
+    | Bits '&' Compare      { $$ = tmp(); head($$ + "=" + $1 + "&" + $3); }
+    | Bits '^' Compare      { $$ = tmp(); head($$ + "=" + $1 + "^" + $3); }
+    | Compare               { $$ = $1; }
     ; 
 
-Compare: Value EQ Value 
-    | Value NE Value
-    | Value LEQ Value
-    | Value GEQ Value
-    | Value '<' Value
-    | Value '>' Value
-    | Value
+Compare: Value EQ Value     { $$ = tmp(); head($$ + "=" + $1 + "==" + $3); } 
+    | Value NE Value        { $$ = tmp(); head($$ + "=" + $1 + "!=" + $3); }
+    | Value LEQ Value       { $$ = tmp(); head($$ + "=" + $1 + "<=" + $3); }
+    | Value GEQ Value       { $$ = tmp(); head($$ + "=" + $1 + ">=" + $3); }
+    | Value '<' Value       { $$ = tmp(); head($$ + "=" + $1 + "<" + $3); }
+    | Value '>' Value       { $$ = tmp(); head($$ + "=" + $1 + "<" + $3); }
+    | Value                 { $$ = $1; }
     ;
 
     /*---------------------------------_ 
      |           Expression             |
      *----------------------------------*/ 
 
-Value: Value SHL Arithmatic
-    | Value SHR Arithmatic
-    | Arithmatic    
+Value: Value SHL Arithmatic         { $$ = tmp(); head($$ + "=" + $1 + "<<" + $3); }
+    | Value SHR Arithmatic          { $$ = tmp(); head($$ + "=" + $1 + ">>" + $3); }
+    | Arithmatic                    { $$ = $1; }
     ;
 
-Arithmatic: Arithmatic '+' Factor
-    | Arithmatic '-' Factor
-    | Factor
+Arithmatic: Arithmatic '+' Factor   { $$ = tmp(); head($$ + "=" + $1 + "+" + $3); }
+    | Arithmatic '-' Factor         { $$ = tmp(); head($$ + "=" + $1 + "-" + $3); }
+    | Factor                        { $$ = $1; }
     ; 
 
-Factor: Factor '*' Unary 
-    | Factor '/' Unary
-    | Factor '%' Unary
-    | Unary
+Factor: Factor '*' Unary    { $$ = tmp(); head($$ + "=" + $1 + "*" + $3); }
+    | Factor '/' Unary      { $$ = tmp(); head($$ + "=" + $1 + "/" + $3); }
+    | Factor '%' Unary      { $$ = tmp(); head($$ + "=" + $1 + "%" + $3); }
+    | Factor PWR Unary      { $$ = tmp(); head($$ + "=power(" + $1 + "," + $3 + ")"); }
+    | Unary                 { $$ = $1; }
     ;
 
-Unary: '!' Unary
-    | '~' Unary
-    | '-' Unary
-    | '+' Unary
-    | Term
+Unary: '!' Unary            { $$ = tmp(); head($$ + "=!" + $2); }
+    | '~' Unary             { $$ = tmp(); head($$ + "=~" + $2); }
+    | '-' Unary             { $$ = tmp(); head($$ + "=-" + $2); }
+    | '+' Unary             { $$ = $2; }
+    | Term                  { $$ = $1; }
     ;
 
 Term: '(' Assignment ')'    { $$ = tmp(); head($$ + "=" + $2); } 
     | Number                { $$ = $1; }
-    | INC ID                { $$ = $2; head($2 + "=" + $2 + "+1"); }
-    | DEC ID                { $$ = $2; head($2 + "=" + $2 + "-1");}
-    | ID INC                { $$ = $1; tail($2 + "=" + $2 + "+1");}
-    | ID DEC                { $$ = $1; tail($2 + "=" + $2 + "-1");}
     | ID                    { $$ = $1; }
- /*
+    | ID INC                { $$ = $1; tail($1 + "=" + $1 + "+1"); }
+    | ID DEC                { $$ = $1; tail($1 + "=" + $1 + "-1"); }
+    | INC ID                { $$ = $2; head($2 + "=" + $2 + "+1"); }
+    | DEC ID                { $$ = $2; head($2 + "=" + $2 + "-1"); }
+    /*
     | FunctionCall
     | MemberAccess
     */

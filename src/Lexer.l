@@ -72,17 +72,9 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "..."               { __RETURN_VAL(THREEDOT); }
 
 "**="               { __RETURN_VAL(PWREQ); } 
-">>="               { __RETURN_VAL(SHRE); }
-"<<="               { __RETURN_VAL(SHLE); }
-"+="                { __RETURN_VAL(PLSE); }
-"-="                { __RETURN_VAL(MNSE); }
-"*="                { __RETURN_VAL(MULE); }
-"/="                { __RETURN_VAL(DIVE); }
-"%="                { __RETURN_VAL(MODE); }
-"|="                { __RETURN_VAL(ORE); }
-"&="                { __RETURN_VAL(ANDE); }
-"^="                { __RETURN_VAL(XORE); }
-"~="                { __RETURN_VAL(NOTE); }
+">>="               { __RETURN_VAL(EQOP); }
+"<<="               { __RETURN_VAL(EQOP); }
+[-+*/%|&^~]=        { __RETURN_VAL(EQOP); }
 
 "=="                { __RETURN_VAL(EQ); }
 "!="                { __RETURN_VAL(NE); }
@@ -121,7 +113,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
     /*********** Keywords **********/
 <INITIAL>{
-"true"|"false"      { token = toNumber(yytext + 2, 2); __RETURN(INT); }
+"true"|"false"      { token = to_string(yytext[0] == 't'); __RETURN(INT); }
 "def"               { __RETURN_VAL(DEF); }
 "if"                { __RETURN_VAL(IF); }
 "elif"              { __RETURN_VAL(ELIF); }
@@ -136,7 +128,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 }
 
     /*********** Identifier **********/
-<INITIAL>{IDF}      { token = yytext; token = "$" + token + "$"; __RETURN(ID); }
+<INITIAL>{IDF}      { __RETURN_VAL(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
 

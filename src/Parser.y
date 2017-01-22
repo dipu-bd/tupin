@@ -4,10 +4,20 @@
 
     int _t_index = 0;
     string _head, _tail;
+    map<string, string> _var;
+    stack<int> _stk;
 
-    string tmp()
-    {        
-        return "$" + to_string(_t_index++);
+    void init()
+    {
+        _stk.push(_t_index);
+    }
+    void clear()
+    {
+        _head = "";
+        _tail = "";
+        _var.clear();
+        _t_index = _stk.top();
+        _stk.pop();
     }
     void head(string exp)
     {
@@ -17,10 +27,17 @@
     {
         _tail = exp + "\n" + _tail;
     }
-    void clear()
+    string var(string name)
     {
-        _head = "";
-        _tail = "";
+        string& id = _var[name];
+        if(id.empty()) {
+            id = "$" + to_string(_var.size());        
+        }
+        return id;
+    }
+    string tmp()
+    {        
+        return "$t" + to_string(_t_index++);
     }
 
 %}
@@ -29,10 +46,10 @@
  
 %token DEF IF ELIF ELSE FOR RETURN CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID COMMENT THREEDOT
+%token EQOP PWREQ 
 %token OR AND EQ NE LEQ GEQ SHR SHL INC DEC PWR
-%token ANDE XORE ORE NOTE MNSE PLSE MULE DIVE MODE SHLE SHRE PWREQ 
  
-%right ANDE XORE ORE NOTE MNSE PLSE MULE DIVE MODE SHLE SHRE PWREQ 
+%right EQOP PWREQ 
 %left OR 
 %left AND
 %left '|'
@@ -55,26 +72,18 @@ Program: Program Expression ';' { cout << $2 << endl; }
     | 
     ;
 
-Expression: Assignment { $$ = _head + "\nResult = " + $1 + "\n" + _tail; clear(); }
+Expression:         { init(); } 
+        Assign      { $$ = _head + _tail + "Res = " + $2; clear(); }
     ;
     
     /*---------------------------------_ 
      |           Assignment             |
      *----------------------------------*/ 
 
-Assignment: ID '=' Assignment   { $$ = $1; head($1 + "=" + $3); }
-    | ID PWREQ Assignment       { $$ = $1; head($1 + "=power(" + $1 + "," + $3 + ")"); }
-    | ID MODE Assignment        { $$ = $1; head($1 + "=" + $1 + "%" + $3); }
-    | ID DIVE Assignment        { $$ = $1; head($1 + "=" + $1 + "/" + $3); }
-    | ID MULE Assignment        { $$ = $1; head($1 + "=" + $1 + "*" + $3); }
-    | ID PLSE Assignment        { $$ = $1; head($1 + "=" + $1 + "+" + $3); }
-    | ID MNSE Assignment        { $$ = $1; head($1 + "=" + $1 + "-" + $3); }
-    | ID ANDE Assignment        { $$ = $1; head($1 + "=" + $1 + "&" + $3); }
-    | ID XORE Assignment        { $$ = $1; head($1 + "=" + $1 + "^" + $3); }
-    | ID ORE Assignment         { $$ = $1; head($1 + "=" + $1 + "|" + $3); }
-    | ID SHRE Assignment        { $$ = $1; head($1 + "=" + $1 + ">>" + $3); }
-    | ID SHLE Assignment        { $$ = $1; head($1 + "=" + $1 + "<<" + $3); }
-    | Boolean                   { $$ = $1; }
+Assign: Var '=' Assign      { $$ = $1; head($1 + "=" + $3); }
+    | Var EQOP Assign       { $$ = $1; head($1 + $2 + $3); } 
+    | Var PWREQ Assign      { $$ = $1; head($1 + "=power(" + $1 + "," + $3 + ")"); }
+    | Boolean               { $$ = $1; }
     ;
  
 Boolean: Boolean OR Bits    { $$ = tmp(); head($$ + "=" + $1 + "||" + $3); }
@@ -101,14 +110,14 @@ Compare: Value EQ Value     { $$ = tmp(); head($$ + "=" + $1 + "==" + $3); }
      |           Expression             |
      *----------------------------------*/ 
 
-Value: Value SHL Arithmatic         { $$ = tmp(); head($$ + "=" + $1 + "<<" + $3); }
-    | Value SHR Arithmatic          { $$ = tmp(); head($$ + "=" + $1 + ">>" + $3); }
-    | Arithmatic                    { $$ = $1; }
+Value: Value SHL Math       { $$ = tmp(); head($$ + "=" + $1 + "<<" + $3); }
+    | Value SHR Math        { $$ = tmp(); head($$ + "=" + $1 + ">>" + $3); }
+    | Math                  { $$ = $1; }
     ;
 
-Arithmatic: Arithmatic '+' Factor   { $$ = tmp(); head($$ + "=" + $1 + "+" + $3); }
-    | Arithmatic '-' Factor         { $$ = tmp(); head($$ + "=" + $1 + "-" + $3); }
-    | Factor                        { $$ = $1; }
+Math: Math '+' Factor       { $$ = tmp(); head($$ + "=" + $1 + "+" + $3); }
+    | Math '-' Factor       { $$ = tmp(); head($$ + "=" + $1 + "-" + $3); }
+    | Factor                { $$ = $1; }
     ; 
 
 Factor: Factor '*' Unary    { $$ = tmp(); head($$ + "=" + $1 + "*" + $3); }
@@ -125,21 +134,24 @@ Unary: '!' Unary            { $$ = tmp(); head($$ + "=!" + $2); }
     | Term                  { $$ = $1; }
     ;
 
-Term: '(' Assignment ')'    { $$ = $2; } 
+Term: '(' Assign ')'        { $$ = $2; } 
     | Number                { $$ = $1; }
-    | ID                    { $$ = $1; }
-    | ID INC                { $$ = $1; tail($1 + "=" + $1 + "+1"); }
-    | ID DEC                { $$ = $1; tail($1 + "=" + $1 + "-1"); }
-    | INC ID                { $$ = $2; head($2 + "=" + $2 + "+1"); }
-    | DEC ID                { $$ = $2; head($2 + "=" + $2 + "-1"); }
+    | Var                   { $$ = $1; }
+    | Var INC               { $$ = $1; tail($1 + "=" + $1 + "+1"); }
+    | Var DEC               { $$ = $1; tail($1 + "=" + $1 + "-1"); }
+    | INC Var               { $$ = $2; head($2 + "=" + $2 + "+1"); }
+    | DEC Var               { $$ = $2; head($2 + "=" + $2 + "-1"); }
     /*
     | FunctionCall
     | MemberAccess
     */
     ;
 
-Number: INT         { $$ = $1; }
-    | FLOAT         { $$ = $1; }
+Number: INT     { $$ = $1; }
+    | FLOAT     { $$ = $1; }
+    ;
+
+Var: ID         { $$ = var($1); }
     ;
 
 %% 

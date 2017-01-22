@@ -1,6 +1,22 @@
 %{ 
     #include "commons.hpp"     
-    #include "ParserHelper.hpp"    
+    #include "ParserHelper.hpp"  
+
+    int _t_index = 0;
+    string _head, _tail;
+
+    string tmp()
+    {        
+        return to_string(_t_index++);
+    }
+    void head(string exp)
+    {
+        _head += exp + "\n";
+    }
+    void tail(string exp)
+    {
+        _tail = exp + "\n" + _tail;
+    }
 %}
 
 %verbose   
@@ -28,7 +44,7 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Assignment ';'        { cout << "OK" << endl; }
+Program: Program Assignment ';'        { cout << _head << "\n" << $2 << "\n" << _tail << "\n"; }
     | error
     | 
     ;
@@ -63,21 +79,21 @@ Bits: Bits '|' Compare
     | Compare
     ; 
 
-Compare: Expression EQ Expression 
-    | Expression NE Expression
-    | Expression LEQ Expression
-    | Expression GEQ Expression
-    | Expression '<' Expression
-    | Expression '>' Expression
-    | Expression
+Compare: Value EQ Value 
+    | Value NE Value
+    | Value LEQ Value
+    | Value GEQ Value
+    | Value '<' Value
+    | Value '>' Value
+    | Value
     ;
 
     /*---------------------------------_ 
      |           Expression             |
      *----------------------------------*/ 
 
-Expression: Expression SHL Arithmatic
-    | Expression SHR Arithmatic
+Value: Value SHL Arithmatic
+    | Value SHR Arithmatic
     | Arithmatic    
     ;
 
@@ -99,21 +115,21 @@ Unary: '!' Unary
     | Term
     ;
 
-Term: '(' Assignment ')'
-    | Number
-    | INC ID
-    | DEC ID
-    | ID INC     
-    | ID DEC
-    | ID
+Term: '(' Assignment ')'    { $$ = tmp(); head($$ + "=" + $2); } 
+    | Number                { $$ = $1; }
+    | INC ID                { $$ = $2; head($2 + "=" + $2 + "+1"); }
+    | DEC ID                { $$ = $2; head($2 + "=" + $2 + "-1");}
+    | ID INC                { $$ = $1; tail($2 + "=" + $2 + "+1");}
+    | ID DEC                { $$ = $1; tail($2 + "=" + $2 + "-1");}
+    | ID                    { $$ = $1; }
  /*
     | FunctionCall
     | MemberAccess
     */
     ;
 
-Number: INT 
-    | FLOAT
+Number: INT         { $$ = $1; }
+    | FLOAT         { $$ = $1; }
     ;
 
 %% 

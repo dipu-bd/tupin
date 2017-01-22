@@ -69,13 +69,20 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
     /*********** Operators **********/
 <INITIAL>{
-
 "..."               { __RETURN_VAL(THREEDOT); }
 
 "**="               { __RETURN_VAL(PWREQ); } 
 ">>="               { __RETURN_VAL(SHRE); }
-"<<="               { __RETURN_VAL(SHLE; }
-[-+*/%&^~]=         { __RETURN_VAL(EQOP); }
+"<<="               { __RETURN_VAL(SHLE); }
+"+="                { __RETURN_VAL(PLSE); }
+"-="                { __RETURN_VAL(MNSE); }
+"*="                { __RETURN_VAL(MULE); }
+"/="                { __RETURN_VAL(DIVE); }
+"%="                { __RETURN_VAL(MODE); }
+"|="                { __RETURN_VAL(ORE); }
+"&="                { __RETURN_VAL(ANDE); }
+"^="                { __RETURN_VAL(XORE); }
+"~="                { __RETURN_VAL(NOTE); }
 
 "=="                { __RETURN_VAL(EQ); }
 "!="                { __RETURN_VAL(NE); }

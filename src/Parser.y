@@ -17,6 +17,12 @@
     {
         _tail = exp + "\n" + _tail;
     }
+    void clear()
+    {
+        _head = "";
+        _tail = "";
+    }
+
 %}
 
 %verbose   
@@ -44,11 +50,14 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Assignment ';'        { cout << _head << "\n" << $2 << "\n" << _tail << "\n"; }
+Program: Program Expression ';' { cout << $2 << endl; }
     | error
     | 
     ;
 
+Expression: Assignment { $$ = _head + "\nResult = " + $1 + "\n" + _tail; clear(); }
+    ;
+    
     /*---------------------------------_ 
      |           Assignment             |
      *----------------------------------*/ 
@@ -116,7 +125,7 @@ Unary: '!' Unary            { $$ = tmp(); head($$ + "=!" + $2); }
     | Term                  { $$ = $1; }
     ;
 
-Term: '(' Assignment ')'    { $$ = tmp(); head($$ + "=" + $2); } 
+Term: '(' Assignment ')'    { $$ = $2; } 
     | Number                { $$ = $1; }
     | ID                    { $$ = $1; }
     | ID INC                { $$ = $1; tail($1 + "=" + $1 + "+1"); }

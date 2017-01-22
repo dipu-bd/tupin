@@ -7,7 +7,8 @@
  
 %token DEF IF ELIF ELSE FOR RETURN CONTINUE BREAK TO BY
 %token STRING INT FLOAT ID COMMENT
-%token OP PWR OPEQ PWREQ THREEDOT
+%token PWREQ SHRE SHLE EQOP 
+%token EQ NE LEQ GEQ OR AND SHR SHL INC DEC PWR
  
 %right "=" OPEQ PWREQ '~' '!' 
 %left OP '<' '>' '&' '^' '|' '+' '-' '*' '/'  '%' PWR
@@ -182,7 +183,3 @@ int main(int argc, char** argv)
 { 
     return MainFunction(argc, argv);
 }
-
-/*
-https://github.com/rabishah/Mini-C-Compiler-using-Flex-And-Yacc/blob/master/c.y
-*/

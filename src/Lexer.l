@@ -69,19 +69,36 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
     /*********** Operators **********/
 <INITIAL>{
+
 "..."               { __RETURN_VAL(THREEDOT); }
+
 "**="               { __RETURN_VAL(PWREQ); } 
-{OP_EQ}             { __RETURN_VAL(OPEQ); }
-{OP_DBL}            { __RETURN_VAL(OP); }
+">>="               { __RETURN_VAL(SHRE); }
+"<<="               { __RETURN_VAL(SHLE; }
+[-+*/%&^~]=         { __RETURN_VAL(EQOP); }
+
+"=="                { __RETURN_VAL(EQ); }
+"!="                { __RETURN_VAL(NE); }
+"<>"                { token="!="; __RETURN(NE); }
+"<="                { __RETURN_VAL(LEQ); }
+">="                { __RETURN_VAL(GEQ); }
+"||"                { __RETURN_VAL(OR); }
+"&&"                { __RETURN_VAL(AND); }
+
 "**"                { __RETURN_VAL(PWR); }
-"<>"                { token="!="; __RETURN(OP); }
-[-+*/%<>=!&^~]      { __RETURN_VAL(OP); }
+">>"                { __RETURN_VAL(SHR); }
+"<<"                { __RETURN_VAL(SHL); }
+"++"                { __RETURN_VAL(INC); }
+"--"                { __RETURN_VAL(DEC); }
+
+[-+*/%<>=!&^~]      { __RETURN_VAL(yytext[0]); }
 [.,;:?(){|}\[\]\\]  { __RETURN_VAL(yytext[0]); } 
 
-"and"               { token="&&"; __RETURN(OP); }
-"or"                { token="||";__RETURN(OP); }
+"and"               { token="&&"; __RETURN(AND); }
+"or"                { token="||";__RETURN(OR); }
 "not"               { __RETURN_VAL('!'); }
 "xor"               { __RETURN_VAL('^'); }
+
 }
 
     /*********** Numbers **********/    
@@ -112,7 +129,7 @@ BADESC          \\([^0-9]|{DIGIT}+)
 }
 
     /*********** Identifier **********/
-<INITIAL>{IDF}       { token = yytext; token = "$" + token + "$"; __RETURN(ID); }
+<INITIAL>{IDF}      { token = yytext; token = "$" + token + "$"; __RETURN(ID); }
 
 .                   { __ERROR("Unrecognized Character"); }
 

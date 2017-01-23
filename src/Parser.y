@@ -19,9 +19,17 @@
         _t_index = _stk.top();
         _stk.pop();
     }
+    string head()
+    {
+        return _head;
+    }
     void head(string exp)
     {
         _head += exp + "\n";
+    }
+    string tail()
+    {
+        return _tail;
     }
     void tail(string exp)
     {
@@ -44,7 +52,7 @@
 
 %verbose   
  
-%token DEF IF ELIF ELSE FOR RETURN CONTINUE BREAK TO BY
+%token DEF IF ELSE FOR RETURN CONTINUE BREAK TO BY GOTO
 %token STRING INT FLOAT ID COMMENT THREEDOT
 %token EQOP PWREQ 
 %token OR AND EQ NE LEQ GEQ SHR SHL INC DEC PWR
@@ -67,20 +75,100 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Expression ';' { cout << $2 << endl; }
+Program: Program Instruction { cout << $2 << endl; }
     | error
     | 
     ;
 
-Expression:         { init(); } 
-        Assign      { $$ = _head + _tail + "Res = " + $2; clear(); }
+Instruction: Function 
+    | Blocks 
+    | 
     ;
-    
+
+Blocks: Blocks SingleBlock
+    |
+    ;
+
+SingleBlock: Loop 
+    | Condition
+    | Single ';'
+    | '{' Blocks '}'
+    ;
+
     /*---------------------------------_ 
-     |           Assignment             |
+     |              Singles             |
      *----------------------------------*/ 
 
-Assign: Var '=' Assign      { $$ = $1; head($1 + "=" + $3); }
+Single: Print          
+    | Expression         
+    | BREAK             
+    | CONTINUE           
+    | RETURN Expression 
+    |  
+    ;
+
+Print: '[' PrintSeq ']'
+    ;
+
+PrintSeq: PrintSeq STRING 
+    | PrintSeq Expression
+    |
+    ; 
+
+    /*---------------------------------_ 
+     |           Conditions             |
+     *----------------------------------*/ 
+Condition: IF '(' Expression ')' SingleBlock ElseBlock
+    | IF '[' Var ']' '{' SwitchBlock '}'
+    ;
+
+ElseBlock: ELSE SingleBlock
+    | 
+    ;
+
+SwitchBlock: Case SwitchBlock
+    | Case 
+    ;
+
+Case: Number ':' Blocks
+    | STRING ':' Blocks
+    ;
+
+    /*---------------------------------_ 
+     |           Loops                  |
+     *----------------------------------*/ 
+Loop: FOR '(' Boolean ')' SingleBlock
+    | FOR '(' Single ';' Boolean ';' Single ')' SingleBlock
+    | FOR '(' Var ':' SpecialTerm ')' SingleBlock
+    ;
+
+    /*---------------------------------_ 
+     |           Arrays                 |
+     *----------------------------------*/ 
+Array: /*EMPTY*/
+    ;
+
+MemberAccess: /*EMPTY*/
+    ;
+
+    /*---------------------------------_ 
+     |           Function               |
+     *----------------------------------*/ 
+Function:  /*EMPTY*/
+    ;
+
+FunctionCall: /*EMPTY*/
+    ;
+
+    /*---------------------------------_ 
+     |           Expression             |
+     *----------------------------------*/ 
+
+Expression:         { init(); } 
+        Assign      { $$ = head() + tail() + "val: " + $2; clear(); }
+    ;
+
+Assign: Var '=' Assign        { $$ = $1; head($1 + "=" + $3); }
     | Var EQOP Assign       { $$ = $1; head($1 + $2 + $3); } 
     | Var PWREQ Assign      { $$ = $1; head($1 + "=power(" + $1 + "," + $3 + ")"); }
     | Boolean               { $$ = $1; }
@@ -105,10 +193,6 @@ Compare: Value EQ Value     { $$ = tmp(); head($$ + "=" + $1 + "==" + $3); }
     | Value '>' Value       { $$ = tmp(); head($$ + "=" + $1 + "<" + $3); }
     | Value                 { $$ = $1; }
     ;
-
-    /*---------------------------------_ 
-     |           Expression             |
-     *----------------------------------*/ 
 
 Value: Value SHL Math       { $$ = tmp(); head($$ + "=" + $1 + "<<" + $3); }
     | Value SHR Math        { $$ = tmp(); head($$ + "=" + $1 + ">>" + $3); }
@@ -141,10 +225,12 @@ Term: '(' Assign ')'        { $$ = $2; }
     | Var DEC               { $$ = $1; tail($1 + "=" + $1 + "-1"); }
     | INC Var               { $$ = $2; head($2 + "=" + $2 + "+1"); }
     | DEC Var               { $$ = $2; head($2 + "=" + $2 + "-1"); }
-    /*
-    | FunctionCall
-    | MemberAccess
-    */
+    | SpecialTerm           { $$ = $1; }
+    ;
+
+SpecialTerm: Array          { $$ = $1; }
+    | FunctionCall          { $$ = $1; }
+    | MemberAccess          { $$ = $1; }
     ;
 
 Number: INT     { $$ = $1; }

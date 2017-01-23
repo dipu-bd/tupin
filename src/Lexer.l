@@ -113,18 +113,17 @@ BADESC          \\([^0-9]|{DIGIT}+)
 
     /*********** Keywords **********/
 <INITIAL>{
-"true"|"false"      { token = to_string(yytext[0] == 't'); __RETURN(INT); }
-"def"               { __RETURN_VAL(DEF); }
-"if"                { __RETURN_VAL(IF); }
-"elif"              { __RETURN_VAL(ELIF); }
-"else"              { __RETURN_VAL(ELSE); }
-"for"               { __RETURN_VAL(FOR); }
-"to"                { __RETURN_VAL(TO); }
-"by"                { __RETURN_VAL(BY); } 
-
-"return"            { __RETURN_VAL(RETURN); }
 "continue"          { __RETURN_VAL(CONTINUE); }
+"return"            { __RETURN_VAL(RETURN); }
 "break"             { __RETURN_VAL(BREAK); }
+"else"              { __RETURN_VAL(ELSE); }
+"goto"              { __RETURN_VAL(GOTO); }
+"false"|"true"      { token = to_string(yytext[0] == 't'); __RETURN(INT); }
+"def"               { __RETURN_VAL(DEF); }
+"for"               { __RETURN_VAL(FOR); }
+"by"                { __RETURN_VAL(BY); }
+"to"                { __RETURN_VAL(TO); } 
+"if"                { __RETURN_VAL(IF); }
 }
 
     /*********** Identifier **********/

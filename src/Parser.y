@@ -115,20 +115,15 @@ Loop: FOR '(' Expression ')' SingleBlock
     /*---------------------------------_ 
      |           Conditions             |
      *----------------------------------*/ 
-Condition: IF '(' Expression ')' SingleBlock ElseBlock
+Condition: IF '{' SwitchBlock '}'
     | IF Var '{' SwitchBlock '}'
-    ;
-
-ElseBlock: ELSE SingleBlock 
-    | 
     ;
 
 SwitchBlock: CaseBlock SwitchBlock
     | CaseBlock
     ;
 
-CaseBlock: CASE Number ':' Blocks
-    | CASE STRING ':' Blocks
+CaseBlock: Expression ':' SingleBlock
     ;
 
 

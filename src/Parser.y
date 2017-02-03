@@ -126,6 +126,36 @@ SwitchBlock: CaseBlock SwitchBlock
 CaseBlock: Expression ':' SingleBlock
     ;
 
+    /*---------------------------------_ 
+     |     Arrays and FunctionCall      |
+     *----------------------------------*/ 
+Array: '[' ArrayVal ']' 
+    ;
+
+ArrayVal: ArrayElem
+    |
+    ;
+
+ArrayElem: Expression
+    | Expression ',' ArrayElem
+    ;
+
+FunctionCall: ID '(' ArrayVal ')' 
+    ; 
+    
+    /*---------------------------------_ 
+     |           Function               |
+     *----------------------------------*/ 
+Function: DEF ID '(' Arguments ')' '{' Blocks '}'
+    ;
+
+Arguments: ArgNames
+    |
+    ;
+
+ArgNames: ID ',' ArgNames
+    | ID
+    ; 
 
     /*---------------------------------_ 
      |           Expression             |
@@ -190,55 +220,28 @@ Term: '(' Assign ')'        { $$ = $2; }
     | Var DEC               { $$ = $1; tail($1 + "=" + $1 + "-1"); }
     | INC Var               { $$ = $2; head($2 + "=" + $2 + "+1"); }
     | DEC Var               { $$ = $2; head($2 + "=" + $2 + "-1"); }
-    | Array                 { $$ = $1; }
     | FunctionCall          { $$ = $1; } 
     | Var                   { $$ = $1; }
-    | Number                { $$ = $1; }
-    | String                { $$ = $1; }
+    | Data                  { $$ = $1; }
     ; 
     
-    /*---------------------------------_ 
-     |     Arrays and FunctionCall      |
-     *----------------------------------*/ 
-Array: '[' ArrayVal ']' 
-    ;
-
-ArrayVal: ArrayElem
-    |
-    ;
-
-ArrayElem: Expression
-    | Expression ',' ArrayElem
-    ;
-
-FunctionCall: ID '(' ArrayVal ')' 
-    ; 
-    
-    /*---------------------------------_ 
-     |           Function               |
-     *----------------------------------*/ 
-Function: DEF ID '(' Arguments ')' '{' Blocks '}'
-    ;
-
-Arguments: ArgNames
-    |
-    ;
-
-ArgNames: ID ',' ArgNames
-    | ID
-    ;
-
     /*---------------------------------_ 
      |           Primitives             |
      *----------------------------------*/ 
-Number: INT         { $$ = $1; }
-    | FLOAT         { $$ = $1; }
+
+Data: Number                { $$ = $1; }
+    | Array                 { $$ = $1; }
+    | String                { $$ = $1; }
+    ;
+    
+Number: INT                 { $$ = $1; }
+    | FLOAT                 { $$ = $1; }
     ;
 
-String: STRING      { $$ = $1; }
+String: STRING              { $$ = $1; }
     ;
 
-Var: ID             { $$ = var($1); }
+Var: ID                     { $$ = var($1); }
     ;
 
 %% 

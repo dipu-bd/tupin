@@ -116,21 +116,22 @@ BADESC          \\([^0-9]|{DIGIT}+)
 "continue"          { __RETURN_VAL(CONTINUE); }
 "return"            { __RETURN_VAL(RETURN); }
 "break"             { __RETURN_VAL(BREAK); }
-"else"              { __RETURN_VAL(ELSE); }
-"goto"              { __RETURN_VAL(GOTO); }
-"false"|"true"      { token = to_string(yytext[0] == 't'); __RETURN(INT); }
+"case"              { __RETURN_VAL(CASE); } 
+"else"              { __RETURN_VAL(ELSE); } 
+"false"             { token = "0"; __RETURN(INT); }
+"true"              { token = "1"; __RETURN(INT); }
 "def"               { __RETURN_VAL(DEF); }
 "for"               { __RETURN_VAL(FOR); }
-"by"                { __RETURN_VAL(BY); }
-"to"                { __RETURN_VAL(TO); } 
 "if"                { __RETURN_VAL(IF); }
 }
 
     /*********** Identifier **********/
 <INITIAL>{IDF}      { __RETURN_VAL(ID); }
 
-.                   { __ERROR("Unrecognized Character"); }
+    /*********** Newlines **********/
+<*>\n               { __NEWLINE; }
 
-<*>\n               { __NEWLINE; } 
+    /*********** Others **********/
+.                   { __ERROR("Unrecognized Character"); }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

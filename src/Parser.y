@@ -52,7 +52,7 @@
 
 %verbose   
  
-%token DEF IF ELSE FOR RETURN CONTINUE BREAK TO BY GOTO
+%token DEF IF ELSE FOR RETURN CONTINUE BREAK CASE
 %token STRING INT FLOAT ID COMMENT THREEDOT
 %token EQOP PWREQ 
 %token OR AND EQ NE LEQ GEQ SHR SHL INC DEC PWR
@@ -75,36 +75,32 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Instruction { cout << $2 << endl; }
-    | error
-    | 
+Program: Instruction { cout << $1 << endl; }
+    | error 
     ;
 
-Instruction: Function 
-    | Blocks 
-    | 
+Instruction: Blocks
+    | Function Instruction
     ;
 
 Blocks: Blocks SingleBlock
     |
     ;
 
-SingleBlock: Loop 
-    | Condition
+SingleBlock: '{' Blocks '}'
     | Single ';'
-    | '{' Blocks '}'
+    | Condition
+    | Loop
     ;
 
     /*---------------------------------_ 
      |              Singles             |
      *----------------------------------*/ 
 
-Single: Print          
-    | Expression         
-    | BREAK             
-    | CONTINUE           
-    | RETURN Expression 
-    |  
+Single: Print           
+    | Break       
+    | Expression 
+    |
     ;
 
 Print: '[' PrintSeq ']'
@@ -113,25 +109,28 @@ Print: '[' PrintSeq ']'
 PrintSeq: PrintSeq STRING 
     | PrintSeq Expression
     |
-    ; 
+    ;
+
+Break: BREAK INT
+    | CONTINUE
+    | BREAK
+    | RETURN Expression
+    ;
 
     /*---------------------------------_ 
      |           Conditions             |
      *----------------------------------*/ 
-Condition: IF '(' Expression ')' SingleBlock ElseBlock
+Condition: IF '(' Expression ')' SingleBlock
+    | IF '(' Expression ')' SingleBlock ELSE SingleBlock
     | IF '[' Var ']' '{' SwitchBlock '}'
     ;
 
-ElseBlock: ELSE SingleBlock
-    | 
+SwitchBlock: CaseBlock SwitchBlock
+    | CaseBlock
     ;
 
-SwitchBlock: Case SwitchBlock
-    | Case 
-    ;
-
-Case: Number ':' Blocks
-    | STRING ':' Blocks
+CaseBlock: CASE Number ':' Blocks
+    | CASE STRING ':' Blocks
     ;
 
     /*---------------------------------_ 
@@ -145,20 +144,33 @@ Loop: FOR '(' Boolean ')' SingleBlock
     /*---------------------------------_ 
      |           Arrays                 |
      *----------------------------------*/ 
-Array: /*EMPTY*/
+Array: '<' ArrayVals '>'    
     ;
 
-MemberAccess: /*EMPTY*/
+ArrayVals: ArrayElem ',' ArrayVals
+    | 
     ;
 
+ArrayElem: Expression
+    | ID '=' Expression
+    ;
+    
     /*---------------------------------_ 
      |           Function               |
      *----------------------------------*/ 
-Function:  /*EMPTY*/
+Function: DEF ID '(' Arguments ')' '{' Blocks '}'
     ;
 
-FunctionCall: /*EMPTY*/
+Arguments: ArgNames
+    |
     ;
+
+ArgNames: ArgNames ',' ID
+    | ID
+    ;
+
+FunctionCall: ID '(' ArrayVals ')' 
+    ; 
 
     /*---------------------------------_ 
      |           Expression             |
@@ -229,8 +241,7 @@ Term: '(' Assign ')'        { $$ = $2; }
     ;
 
 SpecialTerm: Array          { $$ = $1; }
-    | FunctionCall          { $$ = $1; }
-    | MemberAccess          { $$ = $1; }
+    | FunctionCall          { $$ = $1; } 
     ;
 
 Number: INT     { $$ = $1; }

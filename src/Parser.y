@@ -75,12 +75,13 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Instruction { cout << $1 << endl; }
+Program: Program Instruction { cout << $2 << endl; }
     | error 
+    | 
     ;
 
 Instruction: Blocks
-    | Function Instruction
+    | Function
     ;
 
 Blocks: Blocks SingleBlock
@@ -118,6 +119,13 @@ Break: BREAK INT
     ;
 
     /*---------------------------------_ 
+     |           Loops                  |
+     *----------------------------------*/ 
+Loop: FOR '(' Expression ')' SingleBlock
+    | FOR '(' ID ':' Expression ')' SingleBlock 
+    ;
+
+    /*---------------------------------_ 
      |           Conditions             |
      *----------------------------------*/ 
 Condition: IF '(' Expression ')' SingleBlock
@@ -134,25 +142,17 @@ CaseBlock: CASE Number ':' Blocks
     ;
 
     /*---------------------------------_ 
-     |           Loops                  |
-     *----------------------------------*/ 
-Loop: FOR '(' Boolean ')' SingleBlock
-    | FOR '(' Single ';' Boolean ';' Single ')' SingleBlock
-    | FOR '(' Var ':' SpecialTerm ')' SingleBlock
-    ;
-
-    /*---------------------------------_ 
      |           Arrays                 |
      *----------------------------------*/ 
-Array: '<' ArrayVals '>'    
+Array: '<' ArrayVal '>'    
     ;
 
-ArrayVals: ArrayElem ',' ArrayVals
-    | 
+ArrayVal: ArrayElem
+    |
     ;
 
 ArrayElem: Expression
-    | ID '=' Expression
+    | ArrayElem ',' Expression
     ;
     
     /*---------------------------------_ 
@@ -165,11 +165,11 @@ Arguments: ArgNames
     |
     ;
 
-ArgNames: ArgNames ',' ID
+ArgNames: ID ',' ArgNames
     | ID
     ;
 
-FunctionCall: ID '(' ArrayVals ')' 
+FunctionCall: ID '(' ArrayVal ')' 
     ; 
 
     /*---------------------------------_ 
@@ -231,13 +231,13 @@ Unary: '!' Unary            { $$ = tmp(); head($$ + "=!" + $2); }
     ;
 
 Term: '(' Assign ')'        { $$ = $2; } 
-    | Number                { $$ = $1; }
-    | Var                   { $$ = $1; }
     | Var INC               { $$ = $1; tail($1 + "=" + $1 + "+1"); }
     | Var DEC               { $$ = $1; tail($1 + "=" + $1 + "-1"); }
     | INC Var               { $$ = $2; head($2 + "=" + $2 + "+1"); }
     | DEC Var               { $$ = $2; head($2 + "=" + $2 + "-1"); }
+    | Var                   { $$ = $1; }
     | SpecialTerm           { $$ = $1; }
+    | Number                { $$ = $1; }
     ;
 
 SpecialTerm: Array          { $$ = $1; }

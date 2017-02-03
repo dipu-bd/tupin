@@ -57,7 +57,7 @@
 %token EQOP PWREQ 
 %token OR AND EQ NE LEQ GEQ SHR SHL INC DEC PWR
  
-%right EQOP PWREQ 
+%right EQOP PWREQ '='
 %left OR 
 %left AND
 %left '|'
@@ -75,17 +75,10 @@
     /*---------------------------------_ 
      |            Start Point           |
      *----------------------------------*/    
-Program: Program Instruction { cout << $2 << endl; }
+Program: Program SingleBlock        { cout << $2 << endl; }
+    | Program Function              { cout << $2 << endl; }
     | error 
     | 
-    ;
-
-Instruction: Blocks
-    | Function
-    ;
-
-Blocks: Blocks SingleBlock
-    |
     ;
 
 SingleBlock: '{' Blocks '}'
@@ -94,43 +87,40 @@ SingleBlock: '{' Blocks '}'
     | Loop
     ;
 
+Blocks: SingleBlock Blocks 
+    |
+    ;
+
     /*---------------------------------_ 
      |              Singles             |
      *----------------------------------*/ 
 
-Single: Print           
-    | Break       
+Single: Break       
     | Expression 
     |
-    ;
+    ; 
 
-Print: '[' PrintSeq ']'
-    ;
-
-PrintSeq: PrintSeq STRING 
-    | PrintSeq Expression
-    |
-    ;
-
-Break: BREAK INT
+Break: BREAK
+    | BREAK INT
     | CONTINUE
-    | BREAK
     | RETURN Expression
     ;
 
     /*---------------------------------_ 
      |           Loops                  |
      *----------------------------------*/ 
-Loop: FOR '(' Expression ')' SingleBlock
-    | FOR '(' ID ':' Expression ')' SingleBlock 
+Loop: FOR '(' Expression ')' SingleBlock 
     ;
 
     /*---------------------------------_ 
      |           Conditions             |
      *----------------------------------*/ 
-Condition: IF '(' Expression ')' SingleBlock
-    | IF '(' Expression ')' SingleBlock ELSE SingleBlock
-    | IF '[' Var ']' '{' SwitchBlock '}'
+Condition: IF '(' Expression ')' SingleBlock ElseBlock
+    | IF Var '{' SwitchBlock '}'
+    ;
+
+ElseBlock: ELSE SingleBlock 
+    | 
     ;
 
 SwitchBlock: CaseBlock SwitchBlock
@@ -141,59 +131,29 @@ CaseBlock: CASE Number ':' Blocks
     | CASE STRING ':' Blocks
     ;
 
-    /*---------------------------------_ 
-     |           Arrays                 |
-     *----------------------------------*/ 
-Array: '<' ArrayVal '>'    
-    ;
-
-ArrayVal: ArrayElem
-    |
-    ;
-
-ArrayElem: Expression
-    | ArrayElem ',' Expression
-    ;
-    
-    /*---------------------------------_ 
-     |           Function               |
-     *----------------------------------*/ 
-Function: DEF ID '(' Arguments ')' '{' Blocks '}'
-    ;
-
-Arguments: ArgNames
-    |
-    ;
-
-ArgNames: ID ',' ArgNames
-    | ID
-    ;
-
-FunctionCall: ID '(' ArrayVal ')' 
-    ; 
 
     /*---------------------------------_ 
      |           Expression             |
      *----------------------------------*/ 
 
-Expression:         { init(); } 
-        Assign      { $$ = head() + tail() + "val: " + $2; clear(); }
+Expression:                 { init(); } 
+        Assign              { $$ = head() + tail() + "val: " + $2; clear(); }
     ;
 
-Assign: Var '=' Assign        { $$ = $1; head($1 + "=" + $3); }
+Assign: Var '=' Assign      { $$ = $1; head($1 + "=" + $3); }
     | Var EQOP Assign       { $$ = $1; head($1 + $2 + $3); } 
     | Var PWREQ Assign      { $$ = $1; head($1 + "=power(" + $1 + "," + $3 + ")"); }
     | Boolean               { $$ = $1; }
     ;
  
-Boolean: Boolean OR Bits    { $$ = tmp(); head($$ + "=" + $1 + "||" + $3); }
-    | Boolean AND Bits      { $$ = tmp(); head($$ + "=" + $1 + "&&" + $3); }
+Boolean: Bits OR Boolean    { $$ = tmp(); head($$ + "=" + $1 + "||" + $3); }
+    | Bits AND Boolean      { $$ = tmp(); head($$ + "=" + $1 + "&&" + $3); }
     | Bits                  { $$ = $1; } 
     ;
 
-Bits: Bits '|' Compare      { $$ = tmp(); head($$ + "=" + $1 + "|" + $3); }
-    | Bits '&' Compare      { $$ = tmp(); head($$ + "=" + $1 + "&" + $3); }
-    | Bits '^' Compare      { $$ = tmp(); head($$ + "=" + $1 + "^" + $3); }
+Bits: Compare '|' Bits      { $$ = tmp(); head($$ + "=" + $1 + "|" + $3); }
+    | Compare '&' Bits      { $$ = tmp(); head($$ + "=" + $1 + "&" + $3); }
+    | Compare '^' Bits      { $$ = tmp(); head($$ + "=" + $1 + "^" + $3); }
     | Compare               { $$ = $1; }
     ; 
 
@@ -206,20 +166,20 @@ Compare: Value EQ Value     { $$ = tmp(); head($$ + "=" + $1 + "==" + $3); }
     | Value                 { $$ = $1; }
     ;
 
-Value: Value SHL Math       { $$ = tmp(); head($$ + "=" + $1 + "<<" + $3); }
-    | Value SHR Math        { $$ = tmp(); head($$ + "=" + $1 + ">>" + $3); }
+Value: Math SHL Value       { $$ = tmp(); head($$ + "=" + $1 + "<<" + $3); }
+    | Math SHR Value        { $$ = tmp(); head($$ + "=" + $1 + ">>" + $3); }
     | Math                  { $$ = $1; }
     ;
 
-Math: Math '+' Factor       { $$ = tmp(); head($$ + "=" + $1 + "+" + $3); }
-    | Math '-' Factor       { $$ = tmp(); head($$ + "=" + $1 + "-" + $3); }
+Math: Factor '+' Math       { $$ = tmp(); head($$ + "=" + $1 + "+" + $3); }
+    | Factor '-' Math       { $$ = tmp(); head($$ + "=" + $1 + "-" + $3); }
     | Factor                { $$ = $1; }
     ; 
 
-Factor: Factor '*' Unary    { $$ = tmp(); head($$ + "=" + $1 + "*" + $3); }
-    | Factor '/' Unary      { $$ = tmp(); head($$ + "=" + $1 + "/" + $3); }
-    | Factor '%' Unary      { $$ = tmp(); head($$ + "=" + $1 + "%" + $3); }
-    | Factor PWR Unary      { $$ = tmp(); head($$ + "=power(" + $1 + "," + $3 + ")"); }
+Factor: Unary '*' Factor    { $$ = tmp(); head($$ + "=" + $1 + "*" + $3); }
+    | Unary '/' Factor      { $$ = tmp(); head($$ + "=" + $1 + "/" + $3); }
+    | Unary '%' Factor      { $$ = tmp(); head($$ + "=" + $1 + "%" + $3); }
+    | Unary PWR Factor      { $$ = tmp(); head($$ + "=power(" + $1 + "," + $3 + ")"); }
     | Unary                 { $$ = $1; }
     ;
 
@@ -235,20 +195,55 @@ Term: '(' Assign ')'        { $$ = $2; }
     | Var DEC               { $$ = $1; tail($1 + "=" + $1 + "-1"); }
     | INC Var               { $$ = $2; head($2 + "=" + $2 + "+1"); }
     | DEC Var               { $$ = $2; head($2 + "=" + $2 + "-1"); }
-    | Var                   { $$ = $1; }
-    | SpecialTerm           { $$ = $1; }
-    | Number                { $$ = $1; }
-    ;
-
-SpecialTerm: Array          { $$ = $1; }
+    | Array                 { $$ = $1; }
     | FunctionCall          { $$ = $1; } 
+    | Var                   { $$ = $1; }
+    | Number                { $$ = $1; }
+    | String                { $$ = $1; }
+    ; 
+    
+    /*---------------------------------_ 
+     |     Arrays and FunctionCall      |
+     *----------------------------------*/ 
+Array: '[' ArrayVal ']' 
     ;
 
-Number: INT     { $$ = $1; }
-    | FLOAT     { $$ = $1; }
+ArrayVal: ArrayElem
+    |
     ;
 
-Var: ID         { $$ = var($1); }
+ArrayElem: Expression
+    | Expression ',' ArrayElem
+    ;
+
+FunctionCall: ID '(' ArrayVal ')' 
+    ; 
+    
+    /*---------------------------------_ 
+     |           Function               |
+     *----------------------------------*/ 
+Function: DEF ID '(' Arguments ')' '{' Blocks '}'
+    ;
+
+Arguments: ArgNames
+    |
+    ;
+
+ArgNames: ID ',' ArgNames
+    | ID
+    ;
+
+    /*---------------------------------_ 
+     |           Primitives             |
+     *----------------------------------*/ 
+Number: INT         { $$ = $1; }
+    | FLOAT         { $$ = $1; }
+    ;
+
+String: STRING      { $$ = $1; }
+    ;
+
+Var: ID             { $$ = var($1); }
     ;
 
 %% 
